@@ -15,6 +15,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.validation.annotation.Validated;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/san-pham")
@@ -25,52 +27,61 @@ public class SanPhamController {
     private SanPhamService sanPhamService;
 
     @PostMapping
-    public ResponseEntity<Object> createSanPham(@Valid @RequestBody SanPhamModel sanPhamModel, BindingResult bindingResult) {
-        try {
-            if (bindingResult.hasErrors()) {
-                StringBuilder errorMessage = new StringBuilder();
-                bindingResult.getAllErrors().forEach(error -> errorMessage.append(error.getDefaultMessage()).append(". "));
-                return new ResponseEntity<>(errorMessage.toString(), HttpStatus.BAD_REQUEST);
-            }
+    public ResponseEntity<?> createSanPham(@Valid @RequestBody SanPhamModel sanPhamModel, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            List<String> errors = bindingResult.getFieldErrors().stream()
+                    .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                    .collect(Collectors.toList());
+            return ResponseEntity.badRequest().body(errors);
+        }
 
+        try {
             SanPhamDto sanPhamDto = sanPhamService.createSanPham(sanPhamModel);
-            return new ResponseEntity<>(sanPhamDto, HttpStatus.CREATED);
-        } catch (EntityNotFoundException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+            return ResponseEntity.status(HttpStatus.CREATED).body(sanPhamDto);
         } catch (DuplicateKeyException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {
-            return new ResponseEntity<>("Lỗi hệ thống: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Đã xảy ra lỗi trong quá trình xử lý.");
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Object> updateSanPham(@PathVariable Integer id, @Valid @RequestBody SanPhamModel sanPhamModel, BindingResult bindingResult) {
-        try {
-            if (bindingResult.hasErrors()) {
-                StringBuilder errorMessage = new StringBuilder();
-                bindingResult.getAllErrors().forEach(error -> errorMessage.append(error.getDefaultMessage()).append(". "));
-                return new ResponseEntity<>(errorMessage.toString(), HttpStatus.BAD_REQUEST);
-            }
+    public ResponseEntity<?> updateSanPham(@PathVariable Integer id,
+                                           @Valid @RequestBody SanPhamModel sanPhamModel,
+                                           BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            List<String> errors = bindingResult.getFieldErrors().stream()
+                    .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                    .collect(Collectors.toList());
+            return ResponseEntity.badRequest().body(errors);
+        }
 
+        try {
             SanPhamDto sanPhamDto = sanPhamService.updateSanPham(id, sanPhamModel);
-            return new ResponseEntity<>(sanPhamDto, HttpStatus.OK);
-        } catch (EntityNotFoundException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+            return ResponseEntity.ok(sanPhamDto);
         } catch (DuplicateKeyException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {
-            return new ResponseEntity<>("Lỗi hệ thống: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Đã xảy ra lỗi trong quá trình xử lý.");
         }
     }
 
-
-
     @GetMapping("/{id}")
-    public ResponseEntity<SanPhamDto> getSanPhamById(@PathVariable Integer id) {
-        SanPhamDto sanPhamDto = sanPhamService.getSanPhamById(id);
-        return new ResponseEntity<>(sanPhamDto, HttpStatus.OK);
+    public ResponseEntity<Object> getSanPhamById(@PathVariable Integer id) {
+        try {
+            SanPhamDto sanPhamDto = sanPhamService.getSanPhamById(id);
+            return new ResponseEntity<>(sanPhamDto, HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Đã sảy ra lỗi trong quá trình xử lí", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
+
 
     @GetMapping
     public ResponseEntity<Page<SanPhamDto>> getAllSanPham(

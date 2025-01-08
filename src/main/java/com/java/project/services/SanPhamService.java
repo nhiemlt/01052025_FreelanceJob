@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 
 @Service
@@ -30,6 +31,11 @@ public class SanPhamService {
 
     public SanPhamDto createSanPham(SanPhamModel sanPhamModel) {
         SanPham sanPham = new SanPham();
+        if(sanPhamRepository.existsByMaSanPham(sanPhamModel.getMaSanPham())){
+            throw new DuplicateKeyException("Mã sản phẩm đã tồn tại trước đó, vui lòng nhập mã khác");
+        } else if (sanPhamRepository.existsByTenSanPham(sanPhamModel.getTenSanPham())){
+            throw new DuplicateKeyException("Tên sản phẩm đã tồn tại trước đó, vui lòng nhập mã khác");
+        }
         sanPham.setIdDanhMuc(danhMucRepository.findById(sanPhamModel.getIdDanhMuc())
                 .orElseThrow(() -> new EntityNotFoundException("Danh mục không tồn tại")));
         sanPham.setTenSanPham(sanPhamModel.getTenSanPham());
@@ -44,6 +50,12 @@ public class SanPhamService {
     public SanPhamDto updateSanPham(Integer id, SanPhamModel sanPhamModel) {
         SanPham sanPham = sanPhamRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Sản phẩm không tồn tại"));
+
+        if(!Objects.equals(sanPhamModel.getMaSanPham(), sanPham.getMaSanPham()) && sanPhamRepository.existsByMaSanPham(sanPhamModel.getMaSanPham())){
+            throw new DuplicateKeyException("Mã sản phẩm đã tồn tại trước đó, vui lòng nhập mã khác");
+        } else if (!Objects.equals(sanPhamModel.getTenSanPham(), sanPham.getTenSanPham()) && sanPhamRepository.existsByTenSanPham(sanPhamModel.getTenSanPham())){
+            throw new DuplicateKeyException("Tên sản phẩm đã tồn tại trước đó, vui lòng nhập mã khác");
+        }
 
         DanhMuc danhMuc = danhMucRepository.findById(sanPhamModel.getIdDanhMuc())
                 .orElseThrow(() -> new EntityNotFoundException("Danh mục không tồn tại"));
@@ -99,7 +111,7 @@ public class SanPhamService {
 
 
     public SanPhamDto getSanPhamById(Integer id) {
-        SanPham sanPham = sanPhamRepository.findById(id).orElseThrow(() -> new RuntimeException("Sản phẩm không tồn tại"));
+        SanPham sanPham = sanPhamRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Sản phẩm không tồn tại"));
         return SanPhamMapper.toDTO(sanPham);
     }
 

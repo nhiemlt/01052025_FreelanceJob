@@ -2,18 +2,23 @@ package com.java.project.services;
 
 import com.java.project.dtos.SanPhamChiTietDto;
 import com.java.project.entities.*;
+import com.java.project.exceptions.DuplicateKeyException;
 import com.java.project.exceptions.EntityNotFoundException;
 import com.java.project.mappers.SanPhamChiTietMapper;
 import com.java.project.models.SanPhamChiTietModel;
+import com.java.project.models.SanPhamChiTietSingleModel;
 import com.java.project.repositories.*;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Service
 public class SanPhamChiTietService {
@@ -49,16 +54,58 @@ public class SanPhamChiTietService {
     private MoTaRepository moTaRepository;
 
     @Transactional
-    public SanPhamChiTietDto createSanPhamChiTiet(SanPhamChiTietModel sanPhamChiTietModel) {
-        SanPhamChiTiet sanPhamChiTiet = buildSanPhamChiTiet(sanPhamChiTietModel);
+    public void createSanPhamChiTiet(SanPhamChiTietModel sanPhamChiTietModel) {
+        // Duyệt qua từng sự kết hợp và tạo đối tượng SanPhamChiTiet
+        for (Integer idCoAo : sanPhamChiTietModel.getIdCoAoList()) {
+            for (Integer idThietKe : sanPhamChiTietModel.getIdThietKeList()) {
+                for (Integer idThuongHieu : sanPhamChiTietModel.getIdThuongHieuList()) {
+                    for (Integer idKieuDang : sanPhamChiTietModel.getIdKieuDangList()) {
+                        for (Integer idChatLieu : sanPhamChiTietModel.getIdChatLieuList()) {
+                            for (Integer idKichThuoc : sanPhamChiTietModel.getIdKichThuocList()) {
+                                for (Integer idMauSac : sanPhamChiTietModel.getIdMauSacList()) {
+                                    for (Integer idMoTa : sanPhamChiTietModel.getIdMoTaList()) {
 
-        sanPhamChiTiet = sanPhamChiTietRepository.save(sanPhamChiTiet);
+                                        // Kiểm tra sự tồn tại của sản phẩm chi tiết với các ID đã cho
+                                        if (isSanPhamChiTietExist(sanPhamChiTietModel.getIdSanPham(), idCoAo, idThietKe,
+                                                idThuongHieu, idKieuDang, idChatLieu, idKichThuoc, idMauSac, idMoTa)) {
+                                            // Nếu đã tồn tại, bỏ qua việc tạo sản phẩm chi tiết này
+                                            continue;
+                                        }
 
-        return SanPhamChiTietMapper.toDTO(sanPhamChiTiet);
+                                        // Nếu chưa tồn tại, tiến hành tạo sản phẩm chi tiết
+                                        SanPhamChiTietSingleModel tempModel = new SanPhamChiTietSingleModel();
+                                        tempModel.setIdSanPham(sanPhamChiTietModel.getIdSanPham());
+                                        tempModel.setSoLuong(sanPhamChiTietModel.getSoLuong());
+                                        tempModel.setDonGia(sanPhamChiTietModel.getDonGia());
+                                        tempModel.setTrangThai(sanPhamChiTietModel.getTrangThai());
+                                        tempModel.setTrongLuong(sanPhamChiTietModel.getTrongLuong());
+                                        tempModel.setNguoiCapNhat(sanPhamChiTietModel.getNguoiCapNhat());
+
+                                        // Gán các giá trị từ danh sách ID
+                                        tempModel.setIdCoAo(idCoAo);
+                                        tempModel.setIdThietKe(idThietKe);
+                                        tempModel.setIdThuongHieu(idThuongHieu);
+                                        tempModel.setIdKieuDang(idKieuDang);
+                                        tempModel.setIdChatLieu(idChatLieu);
+                                        tempModel.setIdKichThuoc(idKichThuoc);
+                                        tempModel.setIdMauSac(idMauSac);
+                                        tempModel.setIdMoTa(idMoTa);
+
+                                        // Tạo và lưu sản phẩm chi tiết
+                                        SanPhamChiTiet sanPhamChiTiet = buildSanPhamChiTiet(tempModel);
+                                        sanPhamChiTietRepository.save(sanPhamChiTiet);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @Transactional
-    public SanPhamChiTietDto updateSanPhamChiTiet(Integer id, SanPhamChiTietModel sanPhamChiTietModel) {
+    public SanPhamChiTietDto updateSanPhamChiTiet(Integer id, SanPhamChiTietSingleModel sanPhamChiTietModel) {
         SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Chi tiết sản phẩm không tồn tại"));
 
@@ -71,10 +118,9 @@ public class SanPhamChiTietService {
         return SanPhamChiTietMapper.toDTO(sanPhamChiTiet);
     }
 
-    // Phương thức để kiểm tra và gán các giá trị cho đối tượng SanPhamChiTiet
-    private SanPhamChiTiet buildSanPhamChiTiet(SanPhamChiTietModel sanPhamChiTietModel) {
+    private SanPhamChiTiet buildSanPhamChiTiet(SanPhamChiTietSingleModel sanPhamChiTietModel) {
         SanPham sanPham = checkEntityExistence(sanPhamChiTietModel.getIdSanPham(), sanPhamRepository, "Sản phẩm");
-        CoAo coAo = checkEntityExistence(sanPhamChiTietModel.getIdCoAo(), coAoRepository, "Mã sản phẩm");
+        CoAo coAo = checkEntityExistence(sanPhamChiTietModel.getIdCoAo(), coAoRepository, "Cổ áo");
         ThietKe thietKe = checkEntityExistence(sanPhamChiTietModel.getIdThietKe(), thietKeRepository, "Thiết kế");
         ThuongHieu thuongHieu = checkEntityExistence(sanPhamChiTietModel.getIdThuongHieu(), thuongHieuRepository, "Thương hiệu");
         KieuDang kieuDang = checkEntityExistence(sanPhamChiTietModel.getIdKieuDang(), kieuDangRepository, "Kiểu dáng");
@@ -97,8 +143,8 @@ public class SanPhamChiTietService {
         sanPhamChiTiet.setDonGia(sanPhamChiTietModel.getDonGia());
         sanPhamChiTiet.setTrangThai(sanPhamChiTietModel.getTrangThai());
         sanPhamChiTiet.setTrongLuong(sanPhamChiTietModel.getTrongLuong());
-        sanPhamChiTiet.setNgayTao(sanPhamChiTietModel.getNgayTao());
-        sanPhamChiTiet.setNgayCapNhat(sanPhamChiTietModel.getNgayCapNhat());
+        sanPhamChiTiet.setNgayTao(LocalDate.now());
+        sanPhamChiTiet.setNgayCapNhat(LocalDate.now());
         sanPhamChiTiet.setNguoiCapNhat(sanPhamChiTietModel.getNguoiCapNhat());
 
         return sanPhamChiTiet;
@@ -107,6 +153,13 @@ public class SanPhamChiTietService {
     private <T> T checkEntityExistence(Integer id, JpaRepository<T, Integer> repository, String entityName) {
         return repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(entityName + " không tồn tại"));
+    }
+
+    private boolean isSanPhamChiTietExist(Integer idSanPham, Integer idCoAo, Integer idThietKe, Integer idThuongHieu,
+                                          Integer idKieuDang, Integer idChatLieu, Integer idKichThuoc, Integer idMauSac,
+                                          Integer idMoTa) {
+        return sanPhamChiTietRepository.existsBySanPhamIdAndCoAoIdAndThietKeIdAndThuongHieuIdAndKieuDangIdAndChatLieuIdAndKichThuocIdAndMauSacIdAndMoTaId(
+                idSanPham, idCoAo, idThietKe, idThuongHieu, idKieuDang, idChatLieu, idKichThuoc, idMauSac, idMoTa);
     }
 
     private void updateSanPhamChiTietProperties(SanPhamChiTiet existing, SanPhamChiTiet updated) {
@@ -132,7 +185,11 @@ public class SanPhamChiTietService {
         sanPhamChiTietRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Chi tiết sản phẩm không tồn tại"));
 
-        sanPhamChiTietRepository.deleteById(id);
+        try {
+            sanPhamChiTietRepository.deleteById(id);
+        } catch (DataIntegrityViolationException e) {
+            throw new DuplicateKeyException("Không thể xóa do xung đột khóa ngoại");
+        }
     }
 
 
@@ -142,21 +199,50 @@ public class SanPhamChiTietService {
         return SanPhamChiTietMapper.toDTO(sanPhamChiTiet);
     }
 
+    public Page<SanPhamChiTietDto> getSanPhamChiTietBySanPhamId(
+            int page, int size, String sortBy, String direction,
+            Integer idSanPham) {
+
+        Sort sort = direction.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        PageRequest pageRequest = PageRequest.of(page, size, sort);
+
+        // Tìm kiếm sản phẩm chi tiết theo idSanPham
+        Page<SanPhamChiTiet> sanPhamChiTietPage = sanPhamChiTietRepository.findBySanPhamIdPageable(idSanPham, pageRequest);
+
+        // Chuyển đổi sang DTO và trả về
+        return sanPhamChiTietPage.map(SanPhamChiTietMapper::toDTO);
+    }
+
+
     public Page<SanPhamChiTietDto> getAllSanPhamChiTiet(
             int page,
             int size,
             String sortBy,
             String direction,
             String keyword,
-            Integer idSanPham) {
+            Integer idSanPham,
+            Integer coAoId,
+            Integer thietKeId,
+            Integer thuongHieuId,
+            Integer kieuDangId,
+            Integer chatLieuId,
+            Integer kichThuocId,
+            Integer mauSacId,
+            BigDecimal donGiaMin,
+            BigDecimal donGiaMax) {
 
+        // Xử lý sắp xếp
         Sort sort = direction.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         PageRequest pageRequest = PageRequest.of(page, size, sort);
 
+        // Tìm kiếm và lọc các sản phẩm chi tiết
         Page<SanPhamChiTiet> sanPhamChiTietPage = sanPhamChiTietRepository.findAll(
-                keyword, idSanPham, pageRequest);
+                keyword, idSanPham, coAoId, thietKeId, thuongHieuId, kieuDangId,
+                chatLieuId, kichThuocId, mauSacId, donGiaMin, donGiaMax, pageRequest);
 
+        // Chuyển đổi sang DTO và trả về
         return sanPhamChiTietPage.map(SanPhamChiTietMapper::toDTO);
     }
+
 }
 
