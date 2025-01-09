@@ -42,7 +42,25 @@ public interface SanPhamChiTietRepository extends JpaRepository<SanPhamChiTiet, 
     @Query("SELECT s FROM SanPhamChiTiet s WHERE s.sanPham.id = :idSanPham")
     Page<SanPhamChiTiet> findBySanPhamIdPageable(@Param("idSanPham") Integer idSanPham, Pageable pageable);
 
-    boolean existsBySanPhamIdAndCoAoIdAndThietKeIdAndThuongHieuIdAndKieuDangIdAndChatLieuIdAndKichThuocIdAndMauSacIdAndMoTaId(
-            Integer idSanPham, Integer idCoAo, Integer idThietKe, Integer idThuongHieu,
-            Integer idKieuDang, Integer idChatLieu, Integer idKichThuoc, Integer idMauSac, Integer idMoTa);
+    @Query("SELECT CASE WHEN COUNT(e) > 0 THEN true ELSE false END " +
+            "FROM SanPhamChiTiet e " +
+            "WHERE e.sanPham.id = :idSanPham " +
+            "AND e.coAo.id = :idCoAo " +
+            "AND e.thietKe.id = :idThietKe " +
+            "AND e.thuongHieu.id = :idThuongHieu " +
+            "AND e.kieuDang.id = :idKieuDang " +
+            "AND e.chatLieu.id = :idChatLieu " +
+            "AND e.kichThuoc.id = :idKichThuoc " +
+            "AND e.mauSac.id = :idMauSac " +
+            "AND e.moTa.id = :idMoTa")
+    boolean existsBySanPhamDetails(@Param("idSanPham") Integer idSanPham,
+                                   @Param("idCoAo") Integer idCoAo,
+                                   @Param("idThietKe") Integer idThietKe,
+                                   @Param("idThuongHieu") Integer idThuongHieu,
+                                   @Param("idKieuDang") Integer idKieuDang,
+                                   @Param("idChatLieu") Integer idChatLieu,
+                                   @Param("idKichThuoc") Integer idKichThuoc,
+                                   @Param("idMauSac") Integer idMauSac,
+                                   @Param("idMoTa") Integer idMoTa);
+
 }

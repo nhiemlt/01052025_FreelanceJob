@@ -13,7 +13,7 @@ public class SanPhamModel {
     @Positive(message = "ID danh mục phải là số nguyên dương")
     private Integer idDanhMuc;
 
-    @NotNull(message = "Tên sản phẩm không được null")
+    @NotBlank(message = "Tên sản phẩm không được để trống")
     @Size(max = 255, message = "Tên sản phẩm không quá 255 ký tự")
     @Pattern(regexp = "^[a-zA-ZÀ-ỹ0-9 ]*$", message = "Tên sản phẩm chỉ được chứa ký tự chữ, số và khoảng trắng")
     private String tenSanPham;

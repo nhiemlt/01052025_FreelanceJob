@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/san-pham")
-@Validated
 public class SanPhamController {
 
     @Autowired
@@ -69,6 +68,7 @@ public class SanPhamController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Đã xảy ra lỗi trong quá trình xử lý.");
         }
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<Object> getSanPhamById(@PathVariable Integer id) {

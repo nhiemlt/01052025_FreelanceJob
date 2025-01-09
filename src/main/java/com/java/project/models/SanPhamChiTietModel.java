@@ -23,8 +23,9 @@ public class SanPhamChiTietModel {
     @DecimalMin(value = "0.0", inclusive = false, message = "Đơn giá phải lớn hơn 0")
     private BigDecimal donGia;
 
+
+    @NotNull(message = "Người cập nhật không được null")
     @Size(max = 255, message = "Người cập nhật không quá 255 ký tự")
-    @Pattern(regexp = "^[a-zA-ZÀ-ỹ0-9 ]*$", message = "Người cập nhật chỉ được chứa ký tự chữ, số và khoảng trắng")
     private String nguoiCapNhat;
 
     @NotNull(message = "Trạng thái không được null")

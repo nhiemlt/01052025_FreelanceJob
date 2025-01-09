@@ -158,7 +158,7 @@ public class SanPhamChiTietService {
     private boolean isSanPhamChiTietExist(Integer idSanPham, Integer idCoAo, Integer idThietKe, Integer idThuongHieu,
                                           Integer idKieuDang, Integer idChatLieu, Integer idKichThuoc, Integer idMauSac,
                                           Integer idMoTa) {
-        return sanPhamChiTietRepository.existsBySanPhamIdAndCoAoIdAndThietKeIdAndThuongHieuIdAndKieuDangIdAndChatLieuIdAndKichThuocIdAndMauSacIdAndMoTaId(
+        return sanPhamChiTietRepository.existsBySanPhamDetails(
                 idSanPham, idCoAo, idThietKe, idThuongHieu, idKieuDang, idChatLieu, idKichThuoc, idMauSac, idMoTa);
     }
 
