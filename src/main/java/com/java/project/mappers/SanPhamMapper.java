@@ -7,12 +7,11 @@ public class SanPhamMapper {
     public static SanPhamDto toDTO(SanPham sanPham) {
         return SanPhamDto.builder()
                 .id(sanPham.getId())
-                .DanhMuc(DanhMucMapper.toDTO(sanPham.getIdDanhMuc()))
+                .danhMuc(DanhMucMapper.toDTO(sanPham.getDanhMuc()))
                 .tenSanPham(sanPham.getTenSanPham())
                 .maSanPham(sanPham.getMaSanPham())
                 .moTa(sanPham.getMoTa())
                 .trangThai(sanPham.getTrangThai())
-                .sanPhamChiTiets(SanPhamChiTietMapper.toDTOSet(sanPham.getSanPhamChiTiets()))
                 .build();
     }
 }

@@ -7,7 +7,6 @@ public class ThuongHieuMapper {
     public static ThuongHieuDto toDTO(ThuongHieu thuongHieu) {
         return ThuongHieuDto.builder()
                 .id(thuongHieu.getId())
-                .maThuongHieu(thuongHieu.getMaThuongHieu())
                 .tenThuongHieu(thuongHieu.getTenThuongHieu())
                 .trangThai(thuongHieu.getTrangThai())
                 .build();

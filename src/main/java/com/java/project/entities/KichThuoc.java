@@ -1,9 +1,11 @@
 package com.java.project.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Nationalized;
 
 @Getter
@@ -16,17 +18,15 @@ public class KichThuoc {
     @Column(name = "id", nullable = false)
     private Integer id;
 
-    @Size(max = 50)
-    @Nationalized
-    @Column(name = "ma_kich_thuoc", length = 50)
-    private String maKichThuoc;
-
     @Size(max = 255)
+    @NotNull
     @Nationalized
-    @Column(name = "ten_kich_thuoc")
+    @Column(name = "ten_kich_thuoc", nullable = false)
     private String tenKichThuoc;
 
-    @Column(name = "trang_thai", columnDefinition = "tinyint")
-    private Short trangThai;
+    @NotNull
+    @ColumnDefault("1")
+    @Column(name = "trang_thai", nullable = false)
+    private Boolean trangThai = false;
 
 }

@@ -8,14 +8,14 @@ import lombok.Value;
 import java.io.Serializable;
 
 /**
- * DTO for {@link com.java.project.entities.ThuongHieu}
+ * DTO for {@link com.java.project.entities.XuatXu}
  */
 @Builder
-public class ThuongHieuDto implements Serializable {
+public class XuatXuDto implements Serializable {
     Integer id;
     @NotNull
     @Size(max = 255)
-    String tenThuongHieu;
+    String tenXuatXu;
     @NotNull
     Boolean trangThai;
 }

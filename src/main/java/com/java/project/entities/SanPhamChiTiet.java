@@ -1,6 +1,7 @@
 package com.java.project.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,7 +9,7 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Nationalized;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.Instant;
 
 @Getter
 @Setter
@@ -20,64 +21,68 @@ public class SanPhamChiTiet {
     @Column(name = "id", nullable = false)
     private Integer id;
 
-    @Column(name = "so_luong")
-    private Integer soLuong;
-
-    @Column(name = "don_gia", precision = 10, scale = 2)
-    private BigDecimal donGia;
-
-    @ColumnDefault("CONVERT([date],getdate())")
-    @Column(name = "ngay_tao")
-    private LocalDate ngayTao;
-
-    @Column(name = "ngay_cap_nhat")
-    private LocalDate ngayCapNhat;
-
-    @Size(max = 255)
-    @Nationalized
-    @Column(name = "nguoi_cap_nhat")
-    private String nguoiCapNhat;
-
-    @Column(name = "trang_thai", columnDefinition = "tinyint")
-    private Short trangThai;
-
-    @Column(name = "trong_luong", precision = 10, scale = 2)
-    private BigDecimal trongLuong;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "san_pham_id")
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "san_pham_id", nullable = false)
     private SanPham sanPham;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "co_ao_id")
-    private CoAo coAo;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "thiet_ke_id")
-    private ThietKe thietKe;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "thuong_hieu_id")
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "thuong_hieu_id", nullable = false)
     private ThuongHieu thuongHieu;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "kieu_dang_id")
-    private KieuDang kieuDang;
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "xuat_xu_id", nullable = false)
+    private XuatXu xuatXu;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "chat_lieu_id")
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "chat_lieu_id", nullable = false)
     private ChatLieu chatLieu;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "kich_thuoc_id")
-    private KichThuoc kichThuoc;
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "co_ao_id", nullable = false)
+    private CoAo coAo;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "mau_sac_id")
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "tay_ao_id", nullable = false)
+    private TayAo tayAo;
+
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "mau_sac_id", nullable = false)
     private MauSac mauSac;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "mo_ta_id")
-    private MoTa moTa;
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "kich_thuoc_id", nullable = false)
+    private KichThuoc kichThuoc;
+
+    @NotNull
+    @ColumnDefault("0")
+    @Column(name = "so_luong", nullable = false)
+    private Integer soLuong;
+
+    @NotNull
+    @Column(name = "don_gia", nullable = false, precision = 18, scale = 2)
+    private BigDecimal donGia;
+
+    @Size(max = 255)
+    @NotNull
+    @Nationalized
+    @Column(name = "hinh_anh", nullable = false)
+    private String hinhAnh;
+
+    @ColumnDefault("getdate()")
+    @Column(name = "ngay_tao")
+    private Instant ngayTao;
+
+    @NotNull
+    @ColumnDefault("1")
+    @Column(name = "trang_thai", nullable = false)
+    private Boolean trangThai = false;
 
 }

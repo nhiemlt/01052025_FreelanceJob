@@ -7,7 +7,6 @@ public class DanhMucMapper {
     public static DanhMucDto toDTO(DanhMuc danhMuc) {
         return DanhMucDto.builder()
                 .id(danhMuc.getId())
-                .maDanhMuc(danhMuc.getMaDanhMuc())
                 .tenDanhMuc(danhMuc.getTenDanhMuc())
                 .trangThai(danhMuc.getTrangThai())
                 .build();

@@ -7,7 +7,7 @@ public class MauSacMapper {
     public static MauSacDto toDTO(MauSac mauSac) {
         return MauSacDto.builder()
                 .id(mauSac.getId())
-                .maMauSac(mauSac.getMaMauSac())
+                .maHex(mauSac.getMaHex())
                 .tenMauSac(mauSac.getTenMauSac())
                 .trangThai(mauSac.getTrangThai())
                 .build();

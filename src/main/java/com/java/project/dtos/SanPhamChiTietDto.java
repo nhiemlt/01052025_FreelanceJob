@@ -1,29 +1,29 @@
 package com.java.project.dtos;
 
 import lombok.Builder;
-import lombok.Data;
+import lombok.Value;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.Instant;
 
+/**
+ * DTO for {@link com.java.project.entities.SanPhamChiTiet}
+ */
 @Builder
-@Data
-public class SanPhamChiTietDto{
+public class SanPhamChiTietDto implements Serializable {
     Integer id;
-    ThongTinSanPhamDto thongTinSanPham;
+    SanPhamDto sanPham;
+    ThuongHieuDto thuongHieu;
+    XuatXuDto xuatXu;
+    ChatLieuDto chatLieu;
+    CoAoDto coAo;
+    TayAoDto tayAo;
+    MauSacDto mauSac;
+    KichThuocDto kichThuoc;
     Integer soLuong;
     BigDecimal donGia;
-    LocalDate ngayTao;
-    LocalDate ngayCapNhat;
-    String nguoiCapNhat;
-    Short trangThai;
-    BigDecimal trongLuong;
-    CoAoDto coAo;
-    ThietKeDto thietKe;
-    ThuongHieuDto thuongHieu;
-    KieuDangDto kieuDang;
-    ChatLieuDto chatLieu;
-    KichThuocDto kichThuoc;
-    MauSacDto mauSac;
-    MoTaDto moTa;
+    String hinhAnh;
+    Instant ngayTao;
+    Boolean trangThai;
 }

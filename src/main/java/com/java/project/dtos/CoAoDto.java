@@ -1,13 +1,21 @@
 package com.java.project.dtos;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Value;
 
+import java.io.Serializable;
+
+/**
+ * DTO for {@link com.java.project.entities.CoAo}
+ */
 @Builder
-@Data
-public class CoAoDto {
+public class CoAoDto implements Serializable {
     Integer id;
-    String maCoAo;
+    @NotNull
+    @Size(max = 255)
     String tenCoAo;
-    Short trangThai;
+    @NotNull
+    Boolean trangThai;
 }

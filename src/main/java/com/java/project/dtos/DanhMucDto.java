@@ -1,13 +1,21 @@
 package com.java.project.dtos;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Value;
 
+import java.io.Serializable;
+
+/**
+ * DTO for {@link com.java.project.entities.DanhMuc}
+ */
 @Builder
-@Data
-public class DanhMucDto{
+public class DanhMucDto implements Serializable {
     Integer id;
-    String maDanhMuc;
+    @NotNull
+    @Size(max = 255)
     String tenDanhMuc;
-    Short trangThai;
+    @NotNull
+    Boolean trangThai;
 }
