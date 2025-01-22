@@ -2,6 +2,8 @@ package com.java.project.services;
 
 import com.java.project.dtos.XuatXuDto;
 import com.java.project.entities.XuatXu;
+import com.java.project.exceptions.EntityAlreadyExistsException;
+import com.java.project.exceptions.EntityNotFoundException;
 import com.java.project.mappers.XuatXuMapper;
 import com.java.project.repositories.XuatXuRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +26,7 @@ public class XuatXuService {
     @Transactional
     public XuatXuDto addXuatXu(XuatXuDto xuatXuDto) {
         if (xuatXuRepository.findByTenXuatXu(xuatXuDto.getTenXuatXu()).isPresent()) {
-            throw new IllegalArgumentException("Xuất xứ đã tồn tại");
+            throw new EntityAlreadyExistsException("Xuất xứ đã tồn tại");
         }
         XuatXu xuatXu = new XuatXu();
         xuatXu.setTenXuatXu(xuatXuDto.getTenXuatXu());
@@ -36,10 +38,10 @@ public class XuatXuService {
     @Transactional
     public XuatXuDto updateXuatXu(Integer id, XuatXuDto xuatXuDto) {
         XuatXu xuatXu = xuatXuRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy xuất xứ"));
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy xuất xứ"));
 
         if (xuatXuRepository.findByTenXuatXu(xuatXuDto.getTenXuatXu()).isPresent()) {
-            throw new IllegalArgumentException("Xuất xứ đã tồn tại");
+            throw new EntityAlreadyExistsException("Xuất xứ đã tồn tại");
         }
 
         xuatXu.setTenXuatXu(xuatXuDto.getTenXuatXu());
@@ -51,7 +53,7 @@ public class XuatXuService {
     @Transactional
     public void toggleTrangThai(Integer id) {
         XuatXu xuatXu = xuatXuRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy xuất xứ"));
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy xuất xứ"));
         xuatXu.setTrangThai(!xuatXu.getTrangThai());
         xuatXuRepository.save(xuatXu);
     }
@@ -59,7 +61,7 @@ public class XuatXuService {
     @Transactional
     public void deleteXuatXu(Integer id) {
         XuatXu xuatXu = xuatXuRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy xuất xứ"));
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy xuất xứ"));
         xuatXuRepository.delete(xuatXu);
     }
 }

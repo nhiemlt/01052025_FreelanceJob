@@ -2,6 +2,8 @@ package com.java.project.services;
 
 import com.java.project.dtos.MauSacDto;
 import com.java.project.entities.MauSac;
+import com.java.project.exceptions.EntityAlreadyExistsException;
+import com.java.project.exceptions.EntityNotFoundException;
 import com.java.project.mappers.MauSacMapper;
 import com.java.project.repositories.MauSacRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,10 +26,10 @@ public class MauSacService {
     @Transactional
     public MauSacDto addMauSac(MauSacDto mauSacDto) {
         if (mauSacRepository.findByTenMauSac(mauSacDto.getTenMauSac()).isPresent()) {
-            throw new IllegalArgumentException("Tên màu sắc đã tồn tại");
+            throw new EntityAlreadyExistsException("Tên màu sắc đã tồn tại");
         }
         if (mauSacRepository.findByMaHex(mauSacDto.getMaHex()).isPresent()) {
-            throw new IllegalArgumentException("Mã màu HEX đã tồn tại");
+            throw new EntityAlreadyExistsException("Mã màu HEX đã tồn tại");
         }
         MauSac mauSac = new MauSac();
         mauSac.setMaHex(mauSacDto.getMaHex());
@@ -40,14 +42,14 @@ public class MauSacService {
     @Transactional
     public MauSacDto updateMauSac(Integer id, MauSacDto mauSacDto) {
         MauSac mauSac = mauSacRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy màu sắc"));
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy màu sắc"));
 
         if (mauSacRepository.findByTenMauSac(mauSacDto.getTenMauSac()).isPresent()) {
-            throw new IllegalArgumentException("Tên màu sắc đã tồn tại");
+            throw new EntityAlreadyExistsException("Tên màu sắc đã tồn tại");
         }
 
         if (mauSacRepository.findByMaHex(mauSacDto.getMaHex()).isPresent()) {
-            throw new IllegalArgumentException("Mã màu HEX đã tồn tại");
+            throw new EntityAlreadyExistsException("Mã màu HEX đã tồn tại");
         }
 
         mauSac.setMaHex(mauSacDto.getMaHex());
@@ -60,7 +62,7 @@ public class MauSacService {
     @Transactional
     public void toggleTrangThai(Integer id) {
         MauSac mauSac = mauSacRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy màu sắc"));
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy màu sắc"));
         mauSac.setTrangThai(!mauSac.getTrangThai());
         mauSacRepository.save(mauSac);
     }
@@ -68,7 +70,7 @@ public class MauSacService {
     @Transactional
     public void deleteMauSac(Integer id) {
         MauSac mauSac = mauSacRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy màu sắc"));
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy màu sắc"));
         mauSacRepository.delete(mauSac);
     }
 }

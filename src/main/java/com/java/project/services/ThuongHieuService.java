@@ -2,6 +2,8 @@ package com.java.project.services;
 
 import com.java.project.dtos.ThuongHieuDto;
 import com.java.project.entities.ThuongHieu;
+import com.java.project.exceptions.EntityAlreadyExistsException;
+import com.java.project.exceptions.EntityNotFoundException;
 import com.java.project.mappers.ThuongHieuMapper;
 import com.java.project.repositories.ThuongHieuRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +26,7 @@ public class ThuongHieuService {
     @Transactional
     public ThuongHieuDto addThuongHieu(ThuongHieuDto thuongHieuDto) {
         if (thuongHieuRepository.findByTenThuongHieu(thuongHieuDto.getTenThuongHieu()).isPresent()) {
-            throw new IllegalArgumentException("Tên thương hiệu đã tồn tại");
+            throw new EntityAlreadyExistsException("Tên thương hiệu đã tồn tại");
         }
         ThuongHieu thuongHieu = new ThuongHieu();
         thuongHieu.setTenThuongHieu(thuongHieuDto.getTenThuongHieu());
@@ -36,10 +38,10 @@ public class ThuongHieuService {
     @Transactional
     public ThuongHieuDto updateThuongHieu(Integer id, ThuongHieuDto thuongHieuDto) {
         ThuongHieu thuongHieu = thuongHieuRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy thương hiệu"));
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy thương hiệu"));
 
         if (thuongHieuRepository.findByTenThuongHieu(thuongHieuDto.getTenThuongHieu()).isPresent()) {
-            throw new IllegalArgumentException("Tên thương hiệu đã tồn tại");
+            throw new EntityAlreadyExistsException("Tên thương hiệu đã tồn tại");
         }
 
         thuongHieu.setTenThuongHieu(thuongHieuDto.getTenThuongHieu());
@@ -51,7 +53,7 @@ public class ThuongHieuService {
     @Transactional
     public void toggleTrangThai(Integer id) {
         ThuongHieu thuongHieu = thuongHieuRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy thương hiệu"));
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy thương hiệu"));
         thuongHieu.setTrangThai(!thuongHieu.getTrangThai());
         thuongHieuRepository.save(thuongHieu);
     }
@@ -59,7 +61,7 @@ public class ThuongHieuService {
     @Transactional
     public void deleteThuongHieu(Integer id) {
         ThuongHieu thuongHieu = thuongHieuRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy thương hiệu"));
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy thương hiệu"));
         thuongHieuRepository.delete(thuongHieu);
     }
 }

@@ -2,6 +2,8 @@ package com.java.project.services;
 
 import com.java.project.dtos.TayAoDto;
 import com.java.project.entities.TayAo;
+import com.java.project.exceptions.EntityAlreadyExistsException;
+import com.java.project.exceptions.EntityNotFoundException;
 import com.java.project.mappers.TayAoMapper;
 import com.java.project.repositories.TayAoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +26,7 @@ public class TayAoService {
     @Transactional
     public TayAoDto addTayAo(TayAoDto tayAoDto) {
         if (tayAoRepository.findByTenTayAo(tayAoDto.getTenTayAo()).isPresent()) {
-            throw new IllegalArgumentException("Tên tay áo đã tồn tại");
+            throw new EntityAlreadyExistsException("Tên tay áo đã tồn tại");
         }
         TayAo tayAo = new TayAo();
         tayAo.setTenTayAo(tayAoDto.getTenTayAo());
@@ -36,10 +38,10 @@ public class TayAoService {
     @Transactional
     public TayAoDto updateTayAo(Integer id, TayAoDto tayAoDto) {
         TayAo tayAo = tayAoRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy tay áo"));
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy tay áo"));
 
         if (tayAoRepository.findByTenTayAo(tayAoDto.getTenTayAo()).isPresent()) {
-            throw new IllegalArgumentException("Tên tay áo đã tồn tại");
+            throw new EntityAlreadyExistsException("Tên tay áo đã tồn tại");
         }
 
         tayAo.setTenTayAo(tayAoDto.getTenTayAo());
@@ -51,7 +53,7 @@ public class TayAoService {
     @Transactional
     public void toggleTrangThai(Integer id) {
         TayAo tayAo = tayAoRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy tay áo"));
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy tay áo"));
         tayAo.setTrangThai(!tayAo.getTrangThai());
         tayAoRepository.save(tayAo);
     }
@@ -59,7 +61,7 @@ public class TayAoService {
     @Transactional
     public void deleteTayAo(Integer id) {
         TayAo tayAo = tayAoRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy tay áo"));
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy tay áo"));
         tayAoRepository.delete(tayAo);
     }
 }

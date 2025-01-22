@@ -2,6 +2,8 @@ package com.java.project.controllers;
 
 import com.java.project.dtos.ChatLieuDto;
 import com.java.project.services.ChatLieuService;
+import com.java.project.exceptions.EntityAlreadyExistsException;
+import com.java.project.exceptions.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -29,44 +31,73 @@ public class ChatLieuController {
             @RequestParam(value = "sort", defaultValue = "id") String sort,
             @RequestParam(value = "direction", defaultValue = "ASC") String direction) {
 
-        // Tạo Pageable từ PageRequest
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.by(sort).with(Sort.Direction.fromString(direction))));
-        Page<ChatLieuDto> chatLieuDtos = chatLieuService.getAll(search, pageable);
-        return ResponseEntity.ok(chatLieuDtos);
+        try {
+            Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.by(sort).with(Sort.Direction.fromString(direction))));
+            Page<ChatLieuDto> chatLieuDtos = chatLieuService.getAll(search, pageable);
+            return ResponseEntity.ok(chatLieuDtos);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
     // API thêm ChatLieu mới
     @PostMapping
     public ResponseEntity<ChatLieuDto> addChatLieu(@Valid @RequestBody ChatLieuDto chatLieuDto, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(null);
+        try {
+            if (bindingResult.hasErrors()) {
+                return ResponseEntity.badRequest().body(null);
+            }
+            ChatLieuDto newChatLieu = chatLieuService.addChatLieu(chatLieuDto);
+            return ResponseEntity.status(HttpStatus.CREATED).body(newChatLieu);
+        } catch (EntityAlreadyExistsException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
-        ChatLieuDto newChatLieu = chatLieuService.addChatLieu(chatLieuDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(newChatLieu);
     }
 
     // API cập nhật ChatLieu
     @PutMapping("/{id}")
     public ResponseEntity<ChatLieuDto> updateChatLieu(@PathVariable Integer id,
                                                       @Valid @RequestBody ChatLieuDto chatLieuDto, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body(null);
+        try {
+            if (bindingResult.hasErrors()) {
+                return ResponseEntity.badRequest().body(null);
+            }
+            ChatLieuDto updatedChatLieu = chatLieuService.updateChatLieu(id, chatLieuDto);
+            return ResponseEntity.ok(updatedChatLieu);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } catch (EntityAlreadyExistsException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
-        ChatLieuDto updatedChatLieu = chatLieuService.updateChatLieu(id, chatLieuDto);
-        return ResponseEntity.ok(updatedChatLieu);
     }
 
     // API toggle trạng thái của ChatLieu
     @PatchMapping("/{id}/toggle")
     public ResponseEntity<Void> toggleTrangThai(@PathVariable Integer id) {
-        chatLieuService.toggleTrangThai(id);
-        return ResponseEntity.ok().build();
+        try {
+            chatLieuService.toggleTrangThai(id);
+            return ResponseEntity.ok().build();
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     // API xóa ChatLieu
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteChatLieu(@PathVariable Integer id) {
-        chatLieuService.deleteChatLieu(id);
-        return ResponseEntity.noContent().build();
+        try {
+            chatLieuService.deleteChatLieu(id);
+            return ResponseEntity.noContent().build();
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }
