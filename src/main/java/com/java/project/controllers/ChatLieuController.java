@@ -22,7 +22,6 @@ public class ChatLieuController {
     @Autowired
     private ChatLieuService chatLieuService;
 
-    // API lấy tất cả dữ liệu ChatLieu với phân trang, tìm kiếm và sắp xếp
     @GetMapping
     public ResponseEntity<Page<ChatLieuDto>> getAllChatLieu(
             @RequestParam(value = "search", defaultValue = "") String search,

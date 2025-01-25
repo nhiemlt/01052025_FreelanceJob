@@ -18,11 +18,6 @@ public class SanPham {
     @Column(name = "id", nullable = false)
     private Integer id;
 
-    @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "id_danh_muc", nullable = false)
-    private DanhMuc danhMuc;
-
     @Size(max = 255)
     @NotNull
     @Nationalized

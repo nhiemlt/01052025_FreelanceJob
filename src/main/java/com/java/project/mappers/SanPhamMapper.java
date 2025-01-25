@@ -4,11 +4,11 @@ import com.java.project.dtos.SanPhamDto;
 import com.java.project.entities.SanPham;
 
 public class SanPhamMapper {
-    public static SanPhamDto toDTO(SanPham sanPham) {
+    public static SanPhamDto toDTO(SanPham sanPham, Integer tongSoLuong) {
         return SanPhamDto.builder()
                 .id(sanPham.getId())
-                .danhMuc(DanhMucMapper.toDTO(sanPham.getDanhMuc()))
                 .tenSanPham(sanPham.getTenSanPham())
+                .soLuong(tongSoLuong == null ? 0 : tongSoLuong)
                 .maSanPham(sanPham.getMaSanPham())
                 .moTa(sanPham.getMoTa())
                 .trangThai(sanPham.getTrangThai())

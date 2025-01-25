@@ -1,132 +1,96 @@
 package com.java.project.services;
 
 import com.java.project.dtos.SanPhamDto;
-import com.java.project.entities.DanhMuc;
 import com.java.project.entities.SanPham;
-import com.java.project.exceptions.DuplicateKeyException;
+import com.java.project.exceptions.EntityAlreadyExistsException;
 import com.java.project.exceptions.EntityNotFoundException;
 import com.java.project.mappers.SanPhamMapper;
-import com.java.project.models.SanPhamModel;
-import com.java.project.repositories.DanhMucRepository;
 import com.java.project.repositories.SanPhamRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.util.Objects;
-
+import java.util.Optional;
 
 @Service
 public class SanPhamService {
 
     @Autowired
-    DanhMucRepository danhMucRepository;
-
-    @Autowired
     private SanPhamRepository sanPhamRepository;
 
-    public SanPhamDto createSanPham(SanPhamModel sanPhamModel) {
+    @Transactional
+    public SanPhamDto createSanPham(SanPhamDto sanPhamDto) {
+        // Kiểm tra trùng tên sản phẩm
+        Optional<SanPham> existingSanPhamByName = sanPhamRepository.findByTenSanPham(sanPhamDto.getTenSanPham());
+        if (existingSanPhamByName.isPresent()) {
+            throw new EntityAlreadyExistsException("Tên sản phẩm đã tồn tại.");
+        }
+
+        // Kiểm tra trùng mã sản phẩm
+        Optional<SanPham> existingSanPhamByCode = sanPhamRepository.findByMaSanPham(sanPhamDto.getMaSanPham());
+        if (existingSanPhamByCode.isPresent()) {
+            throw new EntityAlreadyExistsException("Mã sản phẩm đã tồn tại.");
+        }
+
         SanPham sanPham = new SanPham();
-        if(sanPhamRepository.existsByMaSanPham(sanPhamModel.getMaSanPham())){
-            throw new DuplicateKeyException("Mã sản phẩm đã tồn tại trước đó, vui lòng nhập mã khác");
-        } else if (sanPhamRepository.existsByTenSanPham(sanPhamModel.getTenSanPham())){
-            throw new DuplicateKeyException("Tên sản phẩm đã tồn tại trước đó, vui lòng nhập mã khác");
-        }
-        sanPham.setIdDanhMuc(danhMucRepository.findById(sanPhamModel.getIdDanhMuc())
-                .orElseThrow(() -> new EntityNotFoundException("Danh mục không tồn tại")));
-        sanPham.setTenSanPham(sanPhamModel.getTenSanPham());
-        sanPham.setMaSanPham(sanPhamModel.getMaSanPham());
-        sanPham.setMoTa(sanPhamModel.getMoTa());
-        sanPham.setTrangThai(sanPhamModel.getTrangThai());
-
-        sanPham = sanPhamRepository.save(sanPham);
-        return SanPhamMapper.toDTO(sanPham);
-    }
-
-    public SanPhamDto updateSanPham(Integer id, SanPhamModel sanPhamModel) {
-        SanPham sanPham = sanPhamRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Sản phẩm không tồn tại"));
-
-        if(!Objects.equals(sanPhamModel.getMaSanPham(), sanPham.getMaSanPham()) && sanPhamRepository.existsByMaSanPham(sanPhamModel.getMaSanPham())){
-            throw new DuplicateKeyException("Mã sản phẩm đã tồn tại trước đó, vui lòng nhập mã khác");
-        } else if (!Objects.equals(sanPhamModel.getTenSanPham(), sanPham.getTenSanPham()) && sanPhamRepository.existsByTenSanPham(sanPhamModel.getTenSanPham())){
-            throw new DuplicateKeyException("Tên sản phẩm đã tồn tại trước đó, vui lòng nhập mã khác");
-        }
-
-        DanhMuc danhMuc = danhMucRepository.findById(sanPhamModel.getIdDanhMuc())
-                .orElseThrow(() -> new EntityNotFoundException("Danh mục không tồn tại"));
-
-        sanPham.setIdDanhMuc(danhMuc);
-        sanPham.setTenSanPham(sanPhamModel.getTenSanPham());
-        sanPham.setMaSanPham(sanPhamModel.getMaSanPham());
-        sanPham.setMoTa(sanPhamModel.getMoTa());
-        sanPham.setTrangThai(sanPhamModel.getTrangThai());
+        sanPham.setTenSanPham(sanPhamDto.getTenSanPham());
+        sanPham.setMaSanPham(sanPhamDto.getMaSanPham());
+        sanPham.setMoTa(sanPhamDto.getMoTa());
+        sanPham.setTrangThai(sanPhamDto.getTrangThai());
 
         sanPhamRepository.save(sanPham);
 
-        return SanPhamMapper.toDTO(sanPham);
+        return SanPhamMapper.toDTO(sanPham, sanPhamRepository.countSLByID(sanPham.getId()));
     }
-
-
-    public Page<SanPhamDto> getAllSanPham(
-            int page,
-            int size,
-            String sortBy,
-            String direction,
-            String keyword,
-            Integer danhMucId,
-            BigDecimal donGiaMin,
-            BigDecimal donGiaMax,
-            Integer coAoId,
-            Integer thietKeId,
-            Integer thuongHieuId,
-            Integer kieuDangId,
-            Integer chatLieuId,
-            Integer kichThuocId,
-            Integer mauSacId) {
-
-        Sort sort = direction.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
-        PageRequest pageRequest = PageRequest.of(page, size, sort);
-
-        Page<SanPham> sanPhamPage = sanPhamRepository.getAll(
-                keyword,
-                danhMucId,
-                donGiaMin,
-                donGiaMax,
-                coAoId,
-                thietKeId,
-                thuongHieuId,
-                kieuDangId,
-                chatLieuId,
-                kichThuocId,
-                mauSacId,
-                pageRequest);
-
-        return sanPhamPage.map(SanPhamMapper::toDTO);
-    }
-
-
-    public SanPhamDto getSanPhamById(Integer id) {
-        SanPham sanPham = sanPhamRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Sản phẩm không tồn tại"));
-        return SanPhamMapper.toDTO(sanPham);
-    }
-
 
     @Transactional
+    public SanPhamDto updateSanPham(Integer id, SanPhamDto sanPhamDto) {
+        SanPham sanPham = sanPhamRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Sản phẩm không tồn tại"));
+
+        // Kiểm tra trùng tên sản phẩm khi cập nhật
+        Optional<SanPham> existingSanPhamByName = sanPhamRepository.findByTenSanPham(sanPhamDto.getTenSanPham());
+        if (existingSanPhamByName.isPresent() && !existingSanPhamByName.get().getId().equals(id)) {
+            throw new EntityAlreadyExistsException("Tên sản phẩm đã tồn tại.");
+        }
+
+        // Kiểm tra trùng mã sản phẩm khi cập nhật
+        Optional<SanPham> existingSanPhamByCode = sanPhamRepository.findByMaSanPham(sanPhamDto.getMaSanPham());
+        if (existingSanPhamByCode.isPresent() && !existingSanPhamByCode.get().getId().equals(id)) {
+            throw new IllegalArgumentException("Mã sản phẩm đã tồn tại.");
+        }
+
+        sanPham.setTenSanPham(sanPhamDto.getTenSanPham());
+        sanPham.setMaSanPham(sanPhamDto.getMaSanPham());
+        sanPham.setMoTa(sanPhamDto.getMoTa());
+        sanPham.setTrangThai(sanPhamDto.getTrangThai());
+
+        sanPhamRepository.save(sanPham);
+
+        return SanPhamMapper.toDTO(sanPham, sanPhamRepository.countSLByID(sanPham.getId()));
+    }
+
+    public Page<SanPhamDto> getAllSanPham(String search, Pageable pageable) {
+        Page<SanPham> sanPhams = sanPhamRepository.searchByNameOrCode(search, pageable);
+        return sanPhams.map(sanPham -> SanPhamMapper.toDTO(sanPham, sanPhamRepository.countSLByID(sanPham.getId())));
+    }
+
+    public SanPhamDto toggleTrangThai(Integer id) {
+        SanPham sanPham = sanPhamRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Sản phẩm không tồn tại"));
+
+        sanPham.setTrangThai(!sanPham.getTrangThai());
+        sanPhamRepository.save(sanPham);
+
+        return SanPhamMapper.toDTO(sanPham, sanPhamRepository.countSLByID(sanPham.getId()));
+    }
+
     public void deleteSanPham(Integer id) {
-        if (!sanPhamRepository.existsById(id)) {
-            throw new EntityNotFoundException("Sản phẩm không tồn tại");
-        }
+        SanPham sanPham = sanPhamRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Sản phẩm không tồn tại"));
 
-        try {
-            sanPhamRepository.deleteById(id);
-        } catch (Exception e) {
-            throw new DuplicateKeyException("Sản phẩm không tồn tại");
-        }
-        }
-
+        sanPhamRepository.delete(sanPham);
+    }
 }
