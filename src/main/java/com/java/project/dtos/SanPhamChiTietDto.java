@@ -1,6 +1,7 @@
 package com.java.project.dtos;
 
 import lombok.Builder;
+import lombok.Data;
 import lombok.Value;
 
 import java.io.Serializable;
@@ -10,6 +11,7 @@ import java.time.Instant;
 /**
  * DTO for {@link com.java.project.entities.SanPhamChiTiet}
  */
+@Data
 @Builder
 public class SanPhamChiTietDto implements Serializable {
     Integer id;

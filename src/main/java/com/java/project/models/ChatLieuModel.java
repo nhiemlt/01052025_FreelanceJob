@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-public class ChatLieu {
+public class ChatLieuModel {
     @NotBlank(message = "Tên chất liệu không được để trống")
     private String tenChatLieu;
 }

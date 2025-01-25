@@ -1,6 +1,7 @@
 package com.java.project.mappers;
 
 import com.java.project.dtos.SanPhamChiTietDto;
+import com.java.project.dtos.SanPhamDto;
 import com.java.project.entities.SanPhamChiTiet;
 
 import java.util.Set;
@@ -10,7 +11,7 @@ public class SanPhamChiTietMapper {
     public static SanPhamChiTietDto toDTO(SanPhamChiTiet sanPhamChiTiet) {
         return SanPhamChiTietDto.builder()
                 .id(sanPhamChiTiet.getId())
-                .sanPham(SanPhamMapper.toDTO(sanPhamChiTiet.getSanPham()))
+                .sanPham(SanPhamMapper.toDTO(sanPhamChiTiet.getSanPham(), 0))
                 .soLuong(sanPhamChiTiet.getSoLuong())
                 .donGia(sanPhamChiTiet.getDonGia())
                 .ngayTao(sanPhamChiTiet.getNgayTao())

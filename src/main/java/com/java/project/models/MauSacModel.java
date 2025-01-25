@@ -3,7 +3,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-public class MauSac {
+public class MauSacModel {
     @NotBlank(message = "Tên màu sắc không được để trống")
     private String tenMauSac;
 
