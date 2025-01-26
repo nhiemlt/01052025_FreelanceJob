@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public interface TayAoRepository extends JpaRepository<TayAo, Integer> {
 
-    @Query("SELECT t FROM TayAo t WHERE t.tenTayAo LIKE %:search% OR t.id = :search")
+    @Query("SELECT t FROM TayAo t WHERE t.tenTayAo LIKE %:search%")
     Page<TayAo> findAllWithSearch(String search, Pageable pageable);
 
     Optional<TayAo> findByTenTayAo(String tenTayAo);

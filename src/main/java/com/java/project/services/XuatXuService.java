@@ -5,6 +5,7 @@ import com.java.project.entities.XuatXu;
 import com.java.project.exceptions.EntityAlreadyExistsException;
 import com.java.project.exceptions.EntityNotFoundException;
 import com.java.project.mappers.XuatXuMapper;
+import com.java.project.models.XuatXuModel;
 import com.java.project.repositories.XuatXuRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -24,28 +25,34 @@ public class XuatXuService {
     }
 
     @Transactional
-    public XuatXuDto addXuatXu(XuatXuDto xuatXuDto) {
-        if (xuatXuRepository.findByTenXuatXu(xuatXuDto.getTenXuatXu()).isPresent()) {
+    public XuatXuDto getById(Integer id) {
+        XuatXu xuatXu = xuatXuRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy xuất xứ"));
+        return XuatXuMapper.toDTO(xuatXu);
+    }
+
+    @Transactional
+    public XuatXuDto addXuatXu(XuatXuModel xuatXuModel) {
+        if (xuatXuRepository.findByTenXuatXu(xuatXuModel.getTenXuatXu()).isPresent()) {
             throw new EntityAlreadyExistsException("Xuất xứ đã tồn tại");
         }
         XuatXu xuatXu = new XuatXu();
-        xuatXu.setTenXuatXu(xuatXuDto.getTenXuatXu());
-        xuatXu.setTrangThai(xuatXuDto.getTrangThai());
+        xuatXu.setTenXuatXu(xuatXuModel.getTenXuatXu());
+        xuatXu.setTrangThai(true);
         xuatXu = xuatXuRepository.save(xuatXu);
         return XuatXuMapper.toDTO(xuatXu);
     }
 
     @Transactional
-    public XuatXuDto updateXuatXu(Integer id, XuatXuDto xuatXuDto) {
+    public XuatXuDto updateXuatXu(Integer id, XuatXuModel xuatXuModel) {
         XuatXu xuatXu = xuatXuRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy xuất xứ"));
 
-        if (xuatXuRepository.findByTenXuatXu(xuatXuDto.getTenXuatXu()).isPresent()) {
+        if (xuatXuRepository.findByTenXuatXu(xuatXuModel.getTenXuatXu()).isPresent()) {
             throw new EntityAlreadyExistsException("Xuất xứ đã tồn tại");
         }
 
-        xuatXu.setTenXuatXu(xuatXuDto.getTenXuatXu());
-        xuatXu.setTrangThai(xuatXuDto.getTrangThai());
+        xuatXu.setTenXuatXu(xuatXuModel.getTenXuatXu());
         xuatXu = xuatXuRepository.save(xuatXu);
         return XuatXuMapper.toDTO(xuatXu);
     }

@@ -5,6 +5,7 @@ import com.java.project.entities.CoAo;
 import com.java.project.exceptions.EntityAlreadyExistsException;
 import com.java.project.exceptions.EntityNotFoundException;
 import com.java.project.mappers.CoAoMapper;
+import com.java.project.models.CoAoModel;
 import com.java.project.repositories.CoAoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,30 +24,35 @@ public class CoAoService {
         return coAos.map(CoAoMapper::toDTO);
     }
 
+    @Transactional
+    public CoAoDto getById(Integer id) {
+        CoAo coAo = coAoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy cổ áo"));
+        return CoAoMapper.toDTO(coAo);
+    }
 
     @Transactional
-    public CoAoDto addCoAo(CoAoDto coAoDto) {
-        if (coAoRepository.findByTenCoAo(coAoDto.getTenCoAo()).isPresent()) {
+    public CoAoDto addCoAo( CoAoModel coAoModel) {
+        if (coAoRepository.findByTenCoAo(coAoModel.getTenCoAo()).isPresent()) {
             throw new EntityAlreadyExistsException("Tên cổ áo đã tồn tại");
         }
         CoAo coAo = new CoAo();
-        coAo.setTenCoAo(coAoDto.getTenCoAo());
-        coAo.setTrangThai(coAoDto.getTrangThai());
+        coAo.setTenCoAo(coAoModel.getTenCoAo());
+        coAo.setTrangThai(true);
         coAo = coAoRepository.save(coAo);
         return CoAoMapper.toDTO(coAo);
     }
 
     @Transactional
-    public CoAoDto updateCoAo(Integer id, CoAoDto coAoDto) {
+    public CoAoDto updateCoAo(Integer id,  CoAoModel coAoModel) {
         CoAo coAo = coAoRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy cổ áo"));
 
-        if (coAoRepository.findByTenCoAo(coAoDto.getTenCoAo()).isPresent()) {
+        if (coAoRepository.findByTenCoAo(coAoModel.getTenCoAo()).isPresent()) {
             throw new EntityAlreadyExistsException("Tên cổ áo đã tồn tại");
         }
 
-        coAo.setTenCoAo(coAoDto.getTenCoAo());
-        coAo.setTrangThai(coAoDto.getTrangThai());
+        coAo.setTenCoAo(coAoModel.getTenCoAo());
         coAo = coAoRepository.save(coAo);
         return CoAoMapper.toDTO(coAo);
     }

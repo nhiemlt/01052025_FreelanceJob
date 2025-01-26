@@ -5,6 +5,7 @@ import com.java.project.entities.KichThuoc;
 import com.java.project.exceptions.EntityAlreadyExistsException;
 import com.java.project.exceptions.EntityNotFoundException;
 import com.java.project.mappers.KichThuocMapper;
+import com.java.project.models.KichThuocModel;
 import com.java.project.repositories.KichThuocRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -24,28 +25,35 @@ public class KichThuocService {
     }
 
     @Transactional
-    public KichThuocDto addKichThuoc(KichThuocDto kichThuocDto) {
-        if (kichThuocRepository.findByTenKichThuoc(kichThuocDto.getTenKichThuoc()).isPresent()) {
+    public KichThuocDto getById(Integer id) {
+        KichThuoc kichThuoc = kichThuocRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy kích thước"));
+        return KichThuocMapper.toDTO(kichThuoc);
+    }
+
+
+    @Transactional
+    public KichThuocDto addKichThuoc(KichThuocModel kichThuocModel)  {
+        if (kichThuocRepository.findByTenKichThuoc(kichThuocModel.getTenKichThuoc()).isPresent()) {
             throw new EntityAlreadyExistsException("Tên kích thước đã tồn tại");
         }
         KichThuoc kichThuoc = new KichThuoc();
-        kichThuoc.setTenKichThuoc(kichThuocDto.getTenKichThuoc());
-        kichThuoc.setTrangThai(kichThuocDto.getTrangThai());
+        kichThuoc.setTenKichThuoc(kichThuocModel.getTenKichThuoc());
+        kichThuoc.setTrangThai(true);
         kichThuoc = kichThuocRepository.save(kichThuoc);
         return KichThuocMapper.toDTO(kichThuoc);
     }
 
     @Transactional
-    public KichThuocDto updateKichThuoc(Integer id, KichThuocDto kichThuocDto) {
+    public KichThuocDto updateKichThuoc(Integer id, KichThuocModel kichThuocModel) {
         KichThuoc kichThuoc = kichThuocRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy kích thước"));
 
-        if (kichThuocRepository.findByTenKichThuoc(kichThuocDto.getTenKichThuoc()).isPresent()) {
+        if (kichThuocRepository.findByTenKichThuoc(kichThuocModel.getTenKichThuoc()).isPresent()) {
             throw new EntityAlreadyExistsException("Tên kích thước đã tồn tại");
         }
 
-        kichThuoc.setTenKichThuoc(kichThuocDto.getTenKichThuoc());
-        kichThuoc.setTrangThai(kichThuocDto.getTrangThai());
+        kichThuoc.setTenKichThuoc(kichThuocModel.getTenKichThuoc());
         kichThuoc = kichThuocRepository.save(kichThuoc);
         return KichThuocMapper.toDTO(kichThuoc);
     }

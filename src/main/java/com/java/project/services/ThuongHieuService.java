@@ -5,6 +5,7 @@ import com.java.project.entities.ThuongHieu;
 import com.java.project.exceptions.EntityAlreadyExistsException;
 import com.java.project.exceptions.EntityNotFoundException;
 import com.java.project.mappers.ThuongHieuMapper;
+import com.java.project.models.ThuongHieuModel;
 import com.java.project.repositories.ThuongHieuRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -24,28 +25,34 @@ public class ThuongHieuService {
     }
 
     @Transactional
-    public ThuongHieuDto addThuongHieu(ThuongHieuDto thuongHieuDto) {
-        if (thuongHieuRepository.findByTenThuongHieu(thuongHieuDto.getTenThuongHieu()).isPresent()) {
+    public ThuongHieuDto getById(Integer id) {
+        ThuongHieu thuongHieu = thuongHieuRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy thương hiệu"));
+        return ThuongHieuMapper.toDTO(thuongHieu);
+    }
+
+    @Transactional
+    public ThuongHieuDto addThuongHieu(ThuongHieuModel thuongHieuModel) {
+        if (thuongHieuRepository.findByTenThuongHieu(thuongHieuModel.getTenThuongHieu()).isPresent()) {
             throw new EntityAlreadyExistsException("Tên thương hiệu đã tồn tại");
         }
         ThuongHieu thuongHieu = new ThuongHieu();
-        thuongHieu.setTenThuongHieu(thuongHieuDto.getTenThuongHieu());
-        thuongHieu.setTrangThai(thuongHieuDto.getTrangThai());
+        thuongHieu.setTenThuongHieu(thuongHieuModel.getTenThuongHieu());
+        thuongHieu.setTrangThai(true);
         thuongHieu = thuongHieuRepository.save(thuongHieu);
         return ThuongHieuMapper.toDTO(thuongHieu);
     }
 
     @Transactional
-    public ThuongHieuDto updateThuongHieu(Integer id, ThuongHieuDto thuongHieuDto) {
+    public ThuongHieuDto updateThuongHieu(Integer id, ThuongHieuModel thuongHieuModel) {
         ThuongHieu thuongHieu = thuongHieuRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy thương hiệu"));
 
-        if (thuongHieuRepository.findByTenThuongHieu(thuongHieuDto.getTenThuongHieu()).isPresent()) {
+        if (thuongHieuRepository.findByTenThuongHieu(thuongHieuModel.getTenThuongHieu()).isPresent()) {
             throw new EntityAlreadyExistsException("Tên thương hiệu đã tồn tại");
         }
 
-        thuongHieu.setTenThuongHieu(thuongHieuDto.getTenThuongHieu());
-        thuongHieu.setTrangThai(thuongHieuDto.getTrangThai());
+        thuongHieu.setTenThuongHieu(thuongHieuModel.getTenThuongHieu());
         thuongHieu = thuongHieuRepository.save(thuongHieu);
         return ThuongHieuMapper.toDTO(thuongHieu);
     }

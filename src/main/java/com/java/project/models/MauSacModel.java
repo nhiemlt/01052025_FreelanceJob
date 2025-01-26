@@ -8,5 +8,5 @@ public class MauSacModel {
     private String tenMauSac;
 
     @NotBlank(message = "Mã màu HEX không được để trống")
-    private String maMauHex;
+    private String maHex;
 }

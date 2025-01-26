@@ -1,9 +1,12 @@
 package com.java.project.controllers;
 
+import com.java.project.dtos.ApiResponse;
 import com.java.project.dtos.SanPhamChiTietDto;
 import com.java.project.dtos.SanPhamChiTietPhanLoaiDTO;
+import com.java.project.exceptions.EntityNotFoundException;
 import com.java.project.models.SanPhamChiTietGenerateModel;
 import com.java.project.models.SanPhamChiTietModel;
+import com.java.project.models.UpdateSanPhamChiTietModel;
 import com.java.project.services.SanPhamChiTietService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,86 +28,99 @@ public class SanPhamChiTietController {
     @Autowired
     private SanPhamChiTietService sanPhamChiTietService;
 
+    @GetMapping
+    public ResponseEntity<ApiResponse> getAllSanPhamChiTiet(@RequestParam(required = false) String search,
+                                                            @RequestParam(required = false) List<Integer> thuongHieuIds,
+                                                            @RequestParam(required = false) List<Integer> xuatXuIds,
+                                                            @RequestParam(required = false) List<Integer> chatLieuIds,
+                                                            @RequestParam(required = false) List<Integer> coAoIds,
+                                                            @RequestParam(required = false) List<Integer> tayAoIds,
+                                                            @RequestParam(required = false) List<Integer> mauSacIds,
+                                                            @RequestParam(required = false) List<Integer> kichThuocIds,
+                                                            Pageable pageable) {
+        try {
+            Page<SanPhamChiTietDto> result = sanPhamChiTietService.getAllSanPhamChiTiet(
+                    search, thuongHieuIds, xuatXuIds, chatLieuIds, coAoIds, tayAoIds, mauSacIds, kichThuocIds, pageable);
+            return ResponseEntity.ok(new ApiResponse("success", "Lấy danh sách chi tiết sản phẩm thành công", result));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse("error", "Có lỗi xảy ra: " + e.getMessage(), null));
+        }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse> getSanPhamChiTietById(@PathVariable Integer id) {
+        try {
+            SanPhamChiTietDto sanPhamChiTietDto = sanPhamChiTietService.getById(id);
+            return ResponseEntity.ok(new ApiResponse("success", "Lấy thông tin chi tiết sản phẩm thành công", sanPhamChiTietDto));
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse("error", e.getMessage(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse("error", "Lỗi hệ thống: " + e.getMessage(), null));
+        }
+    }
+
     @PostMapping
-    public ResponseEntity<?> createSanPhamChiTiet(@RequestBody @Valid List<SanPhamChiTietModel> sanPhamChiTietModels, BindingResult bindingResult) {
+    public ResponseEntity<ApiResponse> createSanPhamChiTiet(@RequestBody @Valid List<SanPhamChiTietModel> sanPhamChiTietModels, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            // Tạo danh sách lỗi và trả về 400 nếu có lỗi xác thực
             List<String> errorMessages = bindingResult.getAllErrors().stream()
                     .map(ObjectError::getDefaultMessage)
                     .collect(Collectors.toList());
-            return ResponseEntity.badRequest().body(errorMessages);
+            return ResponseEntity.badRequest().body(new ApiResponse("error", "Dữ liệu không hợp lệ", errorMessages));
         }
         try {
             List<SanPhamChiTietDto> result = sanPhamChiTietService.createSanPhamChiTietList(sanPhamChiTietModels);
-            return ResponseEntity.ok(result);
+            return ResponseEntity.ok(new ApiResponse("success", "Tạo chi tiết sản phẩm thành công", result));
         } catch (Exception e) {
-            // Xử lý ngoại lệ nếu có lỗi trong service
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Có lỗi xảy ra: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse("error", "Có lỗi xảy ra: " + e.getMessage(), null));
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateSanPhamChiTiet(@PathVariable Integer id, @RequestBody @Valid SanPhamChiTietModel model, BindingResult bindingResult) {
+    public ResponseEntity<ApiResponse> updateSanPhamChiTiet(@PathVariable Integer id,
+                                                            @RequestBody @Valid UpdateSanPhamChiTietModel model,
+                                                            BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             List<String> errorMessages = bindingResult.getAllErrors().stream()
                     .map(ObjectError::getDefaultMessage)
                     .collect(Collectors.toList());
-            return ResponseEntity.badRequest().body(errorMessages);
+            return ResponseEntity.badRequest().body(new ApiResponse("error", "Dữ liệu không hợp lệ", errorMessages));
         }
         try {
             SanPhamChiTietDto result = sanPhamChiTietService.updateSanPhamChiTiet(id, model);
-            return ResponseEntity.ok(result);
+            return ResponseEntity.ok(new ApiResponse("success", "Cập nhật chi tiết sản phẩm thành công", result));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Có lỗi xảy ra: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse("error", "Có lỗi xảy ra: " + e.getMessage(), null));
         }
     }
 
-    @GetMapping
-    public ResponseEntity<?> getAllSanPhamChiTiet(@RequestParam(required = false) String search,
-                                                  @RequestParam(required = false) List<Integer> thuongHieuIds,
-                                                  @RequestParam(required = false) List<Integer> xuatXuIds,
-                                                  @RequestParam(required = false) List<Integer> chatLieuIds,
-                                                  @RequestParam(required = false) List<Integer> coAoIds,
-                                                  @RequestParam(required = false) List<Integer> tayAoIds,
-                                                  @RequestParam(required = false) List<Integer> mauSacIds,
-                                                  @RequestParam(required = false) List<Integer> kichThuocIds,
-                                                  Pageable pageable) {
-        try {
-            Page<SanPhamChiTietDto> result = sanPhamChiTietService.getAllSanPhamChiTiet(
-                    search, thuongHieuIds, xuatXuIds, chatLieuIds, coAoIds, tayAoIds, mauSacIds, kichThuocIds, pageable);
-            return ResponseEntity.ok(result);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Có lỗi xảy ra: " + e.getMessage());
-        }
-    }
 
     @PatchMapping("/{id}/toggle-trang-thai")
-    public ResponseEntity<?> toggleTrangThai(@PathVariable Integer id) {
+    public ResponseEntity<ApiResponse> toggleTrangThai(@PathVariable Integer id) {
         try {
             SanPhamChiTietDto result = sanPhamChiTietService.toggleTrangThai(id);
-            return ResponseEntity.ok(result);
+            return ResponseEntity.ok(new ApiResponse("success", "Cập nhật trạng thái thành công", result));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Có lỗi xảy ra: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse("error", "Có lỗi xảy ra: " + e.getMessage(), null));
         }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteSanPhamChiTiet(@PathVariable Integer id) {
+    public ResponseEntity<ApiResponse> deleteSanPhamChiTiet(@PathVariable Integer id) {
         try {
             sanPhamChiTietService.deleteSanPhamChiTiet(id);
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Có lỗi xảy ra: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse("error", "Có lỗi xảy ra: " + e.getMessage(), null));
         }
     }
 
     @PostMapping("/generate")
-    public ResponseEntity<?> generateSanPhamChiTiet(@RequestBody SanPhamChiTietGenerateModel generateModel) {
+    public ResponseEntity<ApiResponse> generateSanPhamChiTiet(@RequestBody SanPhamChiTietGenerateModel generateModel) {
         try {
             List<SanPhamChiTietPhanLoaiDTO> result = sanPhamChiTietService.generateSanPhamChiTietGroupedByMauSac(generateModel);
-            return ResponseEntity.ok(result);
+            return ResponseEntity.ok(new ApiResponse("success", "Tạo chi tiết sản phẩm thành công", result));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Có lỗi xảy ra: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse("error", "Có lỗi xảy ra: " + e.getMessage(), null));
         }
     }
 

@@ -17,10 +17,13 @@ public class SanPhamChiTietMapper {
                 .ngayTao(sanPhamChiTiet.getNgayTao())
                 .trangThai(sanPhamChiTiet.getTrangThai())
                 .coAo(CoAoMapper.toDTO(sanPhamChiTiet.getCoAo()))
-                .thuongHieu(ThuongHieuMapper.toDTO(sanPhamChiTiet.getThuongHieu()))
                 .chatLieu(ChatLieuMapper.toDTO(sanPhamChiTiet.getChatLieu()))
                 .kichThuoc(KichThuocMapper.toDTO(sanPhamChiTiet.getKichThuoc()))
                 .mauSac(MauSacMapper.toDTO(sanPhamChiTiet.getMauSac()))
+                .tayAo(TayAoMapper.toDTO(sanPhamChiTiet.getTayAo()))
+                .thuongHieu(ThuongHieuMapper.toDTO(sanPhamChiTiet.getThuongHieu()))
+                .xuatXu(XuatXuMapper.toDTO(sanPhamChiTiet.getXuatXu()))
+                .hinhAnh(sanPhamChiTiet.getHinhAnh())
                 .build();
     }
 }

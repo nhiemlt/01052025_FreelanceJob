@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface CoAoRepository extends JpaRepository<CoAo, Integer> {
 
-    @Query("SELECT c FROM CoAo c WHERE c.tenCoAo LIKE %:search% OR c.id = :search")
+    @Query("SELECT c FROM CoAo c WHERE c.tenCoAo LIKE %:search%")
     Page<CoAo> findAllWithSearch(String search, Pageable pageable);
 
     Optional<CoAo> findByTenCoAo(String tenCoAo);

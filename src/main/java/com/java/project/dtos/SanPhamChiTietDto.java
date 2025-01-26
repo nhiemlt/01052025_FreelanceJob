@@ -15,14 +15,14 @@ import java.time.Instant;
 @Builder
 public class SanPhamChiTietDto implements Serializable {
     Integer id;
-    SanPhamDto sanPham;
-    ThuongHieuDto thuongHieu;
-    XuatXuDto xuatXu;
     ChatLieuDto chatLieu;
     CoAoDto coAo;
-    TayAoDto tayAo;
-    MauSacDto mauSac;
     KichThuocDto kichThuoc;
+    MauSacDto mauSac;
+    SanPhamDto sanPham;
+    TayAoDto tayAo;
+    ThuongHieuDto thuongHieu;
+    XuatXuDto xuatXu;
     Integer soLuong;
     BigDecimal donGia;
     String hinhAnh;

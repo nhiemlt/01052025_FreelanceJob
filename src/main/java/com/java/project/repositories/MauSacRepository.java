@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.Optional;
 
 public interface MauSacRepository extends JpaRepository<MauSac, Integer> {
-    @Query("SELECT m FROM MauSac m WHERE m.tenMauSac LIKE %:search% OR m.id = :search")
+    @Query("SELECT m FROM MauSac m WHERE m.tenMauSac LIKE %:search% ")
     Page<MauSac> findAllWithSearch(String search, Pageable pageable);
 
     Optional<MauSac> findByTenMauSac(String tenMauSac);

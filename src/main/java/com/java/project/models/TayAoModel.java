@@ -3,7 +3,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-public class TayAo {
+public class TayAoModel {
     @NotBlank(message = "Tên tay áo không được để trống")
     private String tenTayAo;
 }

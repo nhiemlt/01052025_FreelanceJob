@@ -5,6 +5,7 @@ import com.java.project.entities.TayAo;
 import com.java.project.exceptions.EntityAlreadyExistsException;
 import com.java.project.exceptions.EntityNotFoundException;
 import com.java.project.mappers.TayAoMapper;
+import com.java.project.models.TayAoModel;
 import com.java.project.repositories.TayAoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -24,28 +25,34 @@ public class TayAoService {
     }
 
     @Transactional
-    public TayAoDto addTayAo(TayAoDto tayAoDto) {
-        if (tayAoRepository.findByTenTayAo(tayAoDto.getTenTayAo()).isPresent()) {
+    public TayAoDto getById(Integer id) {
+        TayAo tayAo = tayAoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy tay áo"));
+        return TayAoMapper.toDTO(tayAo);
+    }
+
+    @Transactional
+    public TayAoDto addTayAo(TayAoModel tayAoModel) {
+        if (tayAoRepository.findByTenTayAo(tayAoModel.getTenTayAo()).isPresent()) {
             throw new EntityAlreadyExistsException("Tên tay áo đã tồn tại");
         }
         TayAo tayAo = new TayAo();
-        tayAo.setTenTayAo(tayAoDto.getTenTayAo());
-        tayAo.setTrangThai(tayAoDto.getTrangThai());
+        tayAo.setTenTayAo(tayAoModel.getTenTayAo());
+        tayAo.setTrangThai(true);
         tayAo = tayAoRepository.save(tayAo);
         return TayAoMapper.toDTO(tayAo);
     }
 
     @Transactional
-    public TayAoDto updateTayAo(Integer id, TayAoDto tayAoDto) {
+    public TayAoDto updateTayAo(Integer id, TayAoModel tayAoModel) {
         TayAo tayAo = tayAoRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy tay áo"));
 
-        if (tayAoRepository.findByTenTayAo(tayAoDto.getTenTayAo()).isPresent()) {
+        if (tayAoRepository.findByTenTayAo(tayAoModel.getTenTayAo()).isPresent()) {
             throw new EntityAlreadyExistsException("Tên tay áo đã tồn tại");
         }
 
-        tayAo.setTenTayAo(tayAoDto.getTenTayAo());
-        tayAo.setTrangThai(tayAoDto.getTrangThai());
+        tayAo.setTenTayAo(tayAoModel.getTenTayAo());
         tayAo = tayAoRepository.save(tayAo);
         return TayAoMapper.toDTO(tayAo);
     }

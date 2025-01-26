@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.Optional;
 
 public interface ThuongHieuRepository extends JpaRepository<ThuongHieu, Integer> {
-    @Query("SELECT t FROM ThuongHieu t WHERE t.tenThuongHieu LIKE %:search% OR t.id = :search")
+    @Query("SELECT t FROM ThuongHieu t WHERE t.tenThuongHieu LIKE %:search%")
     Page<ThuongHieu> findAllWithSearch(String search, Pageable pageable);
 
     Optional<ThuongHieu> findByTenThuongHieu(String tenThuongHieu);

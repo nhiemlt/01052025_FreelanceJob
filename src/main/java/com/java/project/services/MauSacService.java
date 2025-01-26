@@ -5,6 +5,7 @@ import com.java.project.entities.MauSac;
 import com.java.project.exceptions.EntityAlreadyExistsException;
 import com.java.project.exceptions.EntityNotFoundException;
 import com.java.project.mappers.MauSacMapper;
+import com.java.project.models.MauSacModel;
 import com.java.project.repositories.MauSacRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -24,37 +25,47 @@ public class MauSacService {
     }
 
     @Transactional
-    public MauSacDto addMauSac(MauSacDto mauSacDto) {
-        if (mauSacRepository.findByTenMauSac(mauSacDto.getTenMauSac()).isPresent()) {
+    public MauSacDto getById(Integer id) {
+        MauSac mauSac = mauSacRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy màu sắc"));
+        return MauSacMapper.toDTO(mauSac);
+    }
+
+
+    @Transactional
+    public MauSacDto addMauSac(MauSacModel mauSacModel){
+        if (mauSacRepository.findByTenMauSac(mauSacModel.getTenMauSac()).isPresent()) {
             throw new EntityAlreadyExistsException("Tên màu sắc đã tồn tại");
         }
-        if (mauSacRepository.findByMaHex(mauSacDto.getMaHex()).isPresent()) {
+
+        if (mauSacRepository.findByMaHex(mauSacModel.getMaHex()).isPresent()) {
             throw new EntityAlreadyExistsException("Mã màu HEX đã tồn tại");
         }
+
         MauSac mauSac = new MauSac();
-        mauSac.setMaHex(mauSacDto.getMaHex());
-        mauSac.setTenMauSac(mauSacDto.getTenMauSac());
-        mauSac.setTrangThai(mauSacDto.getTrangThai());
+
+        mauSac.setMaHex(mauSacModel.getMaHex());
+        mauSac.setTenMauSac(mauSacModel.getTenMauSac());
+        mauSac.setTrangThai(true);
         mauSac = mauSacRepository.save(mauSac);
         return MauSacMapper.toDTO(mauSac);
     }
 
     @Transactional
-    public MauSacDto updateMauSac(Integer id, MauSacDto mauSacDto) {
+    public MauSacDto updateMauSac(Integer id, MauSacModel mauSacModel) {
         MauSac mauSac = mauSacRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy màu sắc"));
 
-        if (mauSacRepository.findByTenMauSac(mauSacDto.getTenMauSac()).isPresent()) {
+        if (mauSacRepository.findByTenMauSac(mauSacModel.getTenMauSac()).isPresent()) {
             throw new EntityAlreadyExistsException("Tên màu sắc đã tồn tại");
         }
 
-        if (mauSacRepository.findByMaHex(mauSacDto.getMaHex()).isPresent()) {
+        if (mauSacRepository.findByMaHex(mauSacModel.getMaHex()).isPresent()) {
             throw new EntityAlreadyExistsException("Mã màu HEX đã tồn tại");
         }
 
-        mauSac.setMaHex(mauSacDto.getMaHex());
-        mauSac.setTenMauSac(mauSacDto.getTenMauSac());
-        mauSac.setTrangThai(mauSacDto.getTrangThai());
+        mauSac.setMaHex(mauSacModel.getMaHex());
+        mauSac.setTenMauSac(mauSacModel.getTenMauSac());
         mauSac = mauSacRepository.save(mauSac);
         return MauSacMapper.toDTO(mauSac);
     }

@@ -9,6 +9,7 @@ import com.java.project.exceptions.EntityNotFoundException;
 import com.java.project.mappers.SanPhamChiTietMapper;
 import com.java.project.models.SanPhamChiTietGenerateModel;
 import com.java.project.models.SanPhamChiTietModel;
+import com.java.project.models.UpdateSanPhamChiTietModel;
 import com.java.project.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -51,6 +52,22 @@ public class SanPhamChiTietService {
     @Autowired
     private KichThuocRepository kichThuocRepository;
 
+    public Page<SanPhamChiTietDto> getAllSanPhamChiTiet(String search, List<Integer> thuongHieuIds, List<Integer> xuatXuIds,
+                                                        List<Integer> chatLieuIds, List<Integer> coAoIds, List<Integer> tayAoIds,
+                                                        List<Integer> mauSacIds, List<Integer> kichThuocIds, Pageable pageable) {
+        Page<SanPhamChiTiet> sanPhamChiTiets = sanPhamChiTietRepository.findBySearchAndFilter(
+                search, thuongHieuIds, xuatXuIds, chatLieuIds, coAoIds, tayAoIds, mauSacIds, kichThuocIds, pageable);
+
+        return sanPhamChiTiets.map(SanPhamChiTietMapper::toDTO);
+    }
+
+    @Transactional
+    public SanPhamChiTietDto getById(Integer id) {
+        SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Chi tiết sản phẩm không tồn tại"));
+        return SanPhamChiTietMapper.toDTO(sanPhamChiTiet);
+    }
+
     @Transactional
     public List<SanPhamChiTietDto> createSanPhamChiTietList(List<SanPhamChiTietModel> sanPhamChiTietModels) {
         List<SanPhamChiTietDto> result = new ArrayList<>();
@@ -76,35 +93,27 @@ public class SanPhamChiTietService {
         return result;
     }
 
-
     @Transactional
-    public SanPhamChiTietDto updateSanPhamChiTiet(Integer id, SanPhamChiTietModel model) {
-        // Kiểm tra sự tồn tại của các khóa ngoại
-        validateExistence(model);
+    public SanPhamChiTietDto updateSanPhamChiTiet(Integer id, UpdateSanPhamChiTietModel model) {
 
-        // Tìm kiếm chi tiết sản phẩm theo ID
         SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Chi tiết sản phẩm không tồn tại"));
 
-        // Cập nhật thông tin từ model sang entity
-        mapToEntity(model, sanPhamChiTiet);
+        if (model.getSoLuong() != null) {
+            sanPhamChiTiet.setSoLuong(model.getSoLuong());
+        }
+        if (model.getDonGia() != null) {
+            sanPhamChiTiet.setDonGia(model.getDonGia());
+        }
+        if (model.getHinhAnh() != null) {
+            sanPhamChiTiet.setHinhAnh(model.getHinhAnh());
+        }
 
-        // Lưu thông tin đã cập nhật
         sanPhamChiTietRepository.save(sanPhamChiTiet);
 
-        // Trả về DTO
         return SanPhamChiTietMapper.toDTO(sanPhamChiTiet);
     }
 
-
-    public Page<SanPhamChiTietDto> getAllSanPhamChiTiet(String search, List<Integer> thuongHieuIds, List<Integer> xuatXuIds,
-                                                        List<Integer> chatLieuIds, List<Integer> coAoIds, List<Integer> tayAoIds,
-                                                        List<Integer> mauSacIds, List<Integer> kichThuocIds, Pageable pageable) {
-        Page<SanPhamChiTiet> sanPhamChiTiets = sanPhamChiTietRepository.findBySearchAndFilter(
-                search, thuongHieuIds, xuatXuIds, chatLieuIds, coAoIds, tayAoIds, mauSacIds, kichThuocIds, pageable);
-
-        return sanPhamChiTiets.map(SanPhamChiTietMapper::toDTO);
-    }
 
     public SanPhamChiTietDto toggleTrangThai(Integer id) {
         SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietRepository.findById(id)

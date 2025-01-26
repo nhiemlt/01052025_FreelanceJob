@@ -16,8 +16,6 @@ import java.io.Serializable;
 public class SanPhamDto implements Serializable {
     Integer id;
     @NotNull
-    DanhMucDto danhMuc;
-    @NotNull
     @Size(max = 255)
     String tenSanPham;
 
