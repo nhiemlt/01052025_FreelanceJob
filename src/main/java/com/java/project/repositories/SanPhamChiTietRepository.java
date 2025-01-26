@@ -42,4 +42,17 @@ public interface SanPhamChiTietRepository extends JpaRepository<SanPhamChiTiet, 
     SanPhamChiTiet findBySanPhamAndThuongHieuAndXuatXuAndChatLieuAndCoAoAndTayAoAndMauSacAndKichThuoc(
             Integer sanPhamId, Integer thuongHieuId, Integer xuatXuId, Integer chatLieuId, Integer coAoId,
             Integer tayAoId, Integer mauSacId, Integer kichThuocId);
+
+    @Query("SELECT CASE WHEN COUNT(s) > 0 THEN true ELSE false END " +
+            "FROM SanPhamChiTiet s WHERE s.sanPham.id = :sanPhamId " +
+            "AND s.thuongHieu.id = :thuongHieuId " +
+            "AND s.xuatXu.id = :xuatXuId " +
+            "AND s.chatLieu.id = :chatLieuId " +
+            "AND s.coAo.id = :coAoId " +
+            "AND s.tayAo.id = :tayAoId " +
+            "AND s.mauSac.id = :mauSacId " +
+            "AND s.kichThuoc.id = :kichThuocId")
+    boolean existsBySanPhamAndThuongHieuAndXuatXuAndChatLieuAndCoAoAndTayAoAndMauSacAndKichThuoc(
+            Integer sanPhamId, Integer thuongHieuId, Integer xuatXuId, Integer chatLieuId, Integer coAoId,
+            Integer tayAoId, Integer mauSacId, Integer kichThuocId);
 }

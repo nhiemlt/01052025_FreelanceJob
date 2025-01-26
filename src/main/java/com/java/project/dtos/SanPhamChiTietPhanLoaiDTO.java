@@ -11,5 +11,5 @@ import java.util.List;
 public class SanPhamChiTietPhanLoaiDTO implements Serializable {
     Integer maMauSac;
     String tenMauSac;
-    List<SanPhamChiTietPhanLoaiDTO> sanPhamChiTiet;
+    List<SanPhamChiTietGenerateDTO> sanPhamChiTiet;
 }

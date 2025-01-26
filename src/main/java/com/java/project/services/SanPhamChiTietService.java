@@ -4,6 +4,7 @@ import com.java.project.dtos.SanPhamChiTietDto;
 import com.java.project.dtos.SanPhamChiTietGenerateDTO;
 import com.java.project.dtos.SanPhamChiTietPhanLoaiDTO;
 import com.java.project.entities.SanPhamChiTiet;
+import com.java.project.exceptions.EntityAlreadyExistsException;
 import com.java.project.exceptions.EntityNotFoundException;
 import com.java.project.mappers.SanPhamChiTietMapper;
 import com.java.project.models.SanPhamChiTietGenerateModel;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -50,34 +52,47 @@ public class SanPhamChiTietService {
     private KichThuocRepository kichThuocRepository;
 
     @Transactional
-    public List<SanPhamChiTietDto> createSanPhamChiTietList(List<SanPhamChiTietDto> sanPhamChiTietDtos) {
+    public List<SanPhamChiTietDto> createSanPhamChiTietList(List<SanPhamChiTietModel> sanPhamChiTietModels) {
         List<SanPhamChiTietDto> result = new ArrayList<>();
-        for (SanPhamChiTietDto sanPhamChiTietDto : sanPhamChiTietDtos) {
-            validateExistence(sanPhamChiTietDto);
-            checkUniqueSanPhamChiTiet(sanPhamChiTietDto);
 
+        for (SanPhamChiTietModel model : sanPhamChiTietModels) {
+            // Kiểm tra dữ liệu có tồn tại không
+            validateExistence(model);
+
+            // Kiểm tra uniqueness
+            checkUniqueSanPhamChiTiet(model);
+
+            // Map từ model sang entity
             SanPhamChiTiet sanPhamChiTiet = new SanPhamChiTiet();
-            mapToEntity(sanPhamChiTietDto, sanPhamChiTiet);
+            mapToEntity(model, sanPhamChiTiet);
+
+            // Lưu entity vào database
             sanPhamChiTietRepository.save(sanPhamChiTiet);
 
+            // Thêm kết quả trả về
             result.add(SanPhamChiTietMapper.toDTO(sanPhamChiTiet));
         }
+
         return result;
     }
 
+
     @Transactional
-    public SanPhamChiTietDto updateSanPhamChiTiet(Integer id, SanPhamChiTietDto sanPhamChiTietDto) {
-        // Kiểm tra sự tồn tại của các thực thể
-        validateExistence(sanPhamChiTietDto);
+    public SanPhamChiTietDto updateSanPhamChiTiet(Integer id, SanPhamChiTietModel model) {
+        // Kiểm tra sự tồn tại của các khóa ngoại
+        validateExistence(model);
 
         // Tìm kiếm chi tiết sản phẩm theo ID
         SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("SanPhamChiTiet không tồn tại"));
+                .orElseThrow(() -> new EntityNotFoundException("Chi tiết sản phẩm không tồn tại"));
 
-        // Cập nhật thông tin chi tiết sản phẩm
-        mapToEntity(sanPhamChiTietDto, sanPhamChiTiet);
+        // Cập nhật thông tin từ model sang entity
+        mapToEntity(model, sanPhamChiTiet);
+
+        // Lưu thông tin đã cập nhật
         sanPhamChiTietRepository.save(sanPhamChiTiet);
 
+        // Trả về DTO
         return SanPhamChiTietMapper.toDTO(sanPhamChiTiet);
     }
 
@@ -109,72 +124,107 @@ public class SanPhamChiTietService {
         sanPhamChiTietRepository.delete(sanPhamChiTiet);
     }
 
-    private void validateExistence(SanPhamChiTietDto sanPhamChiTietDto) {
-        Optional.ofNullable(sanPhamChiTietDto.getSanPham())
-                .ifPresent(sanPham -> sanPhamRepository.findById(sanPham.getId())
+    private void validateExistence(SanPhamChiTietModel model) {
+        // Kiểm tra sự tồn tại của từng khóa ngoại (tương tự validateExistence của bạn)
+        Optional.ofNullable(model.getSanPham())
+                .ifPresent(sanPham -> sanPhamRepository.findById(sanPham)
                         .orElseThrow(() -> new EntityNotFoundException("Sản phẩm không tồn tại")));
 
-        Optional.ofNullable(sanPhamChiTietDto.getThuongHieu())
-                .ifPresent(thuongHieu -> thuongHieuRepository.findById(thuongHieu.getId())
+        Optional.ofNullable(model.getThuongHieu())
+                .ifPresent(thuongHieu -> thuongHieuRepository.findById(thuongHieu)
                         .orElseThrow(() -> new EntityNotFoundException("Thương hiệu không tồn tại")));
 
-        Optional.ofNullable(sanPhamChiTietDto.getXuatXu())
-                .ifPresent(xuatXu -> xuatXuRepository.findById(xuatXu.getId())
+        // Tương tự cho các trường khác
+        Optional.ofNullable(model.getXuatXu())
+                .ifPresent(xuatXu -> xuatXuRepository.findById(xuatXu)
                         .orElseThrow(() -> new EntityNotFoundException("Xuất xứ không tồn tại")));
 
-        Optional.ofNullable(sanPhamChiTietDto.getChatLieu())
-                .ifPresent(chatLieu -> chatLieuRepository.findById(chatLieu.getId())
+        Optional.ofNullable(model.getChatLieu())
+                .ifPresent(chatLieu -> chatLieuRepository.findById(chatLieu)
                         .orElseThrow(() -> new EntityNotFoundException("Chất liệu không tồn tại")));
 
-        Optional.ofNullable(sanPhamChiTietDto.getCoAo())
-                .ifPresent(coAo -> coAoRepository.findById(coAo.getId())
+        Optional.ofNullable(model.getCoAo())
+                .ifPresent(coAo -> coAoRepository.findById(coAo)
                         .orElseThrow(() -> new EntityNotFoundException("Cỡ áo không tồn tại")));
 
-        Optional.ofNullable(sanPhamChiTietDto.getTayAo())
-                .ifPresent(tayAo -> tayAoRepository.findById(tayAo.getId())
+        Optional.ofNullable(model.getTayAo())
+                .ifPresent(tayAo -> tayAoRepository.findById(tayAo)
                         .orElseThrow(() -> new EntityNotFoundException("Tay áo không tồn tại")));
 
-        Optional.ofNullable(sanPhamChiTietDto.getMauSac())
-                .ifPresent(mauSac -> mauSacRepository.findById(mauSac.getId())
+        Optional.ofNullable(model.getMauSac())
+                .ifPresent(mauSac -> mauSacRepository.findById(mauSac)
                         .orElseThrow(() -> new EntityNotFoundException("Màu sắc không tồn tại")));
 
-        Optional.ofNullable(sanPhamChiTietDto.getKichThuoc())
-                .ifPresent(kichThuoc -> kichThuocRepository.findById(kichThuoc.getId())
+        Optional.ofNullable(model.getKichThuoc())
+                .ifPresent(kichThuoc -> kichThuocRepository.findById(kichThuoc)
                         .orElseThrow(() -> new EntityNotFoundException("Kích thước không tồn tại")));
     }
 
-    private void checkUniqueSanPhamChiTiet(SanPhamChiTietDto sanPhamChiTietDto) {
-        SanPhamChiTiet existingSanPhamChiTiet = sanPhamChiTietRepository.findBySanPhamAndThuongHieuAndXuatXuAndChatLieuAndCoAoAndTayAoAndMauSacAndKichThuoc(
-                sanPhamChiTietDto.getSanPham().getId(),
-                sanPhamChiTietDto.getThuongHieu().getId(),
-                sanPhamChiTietDto.getXuatXu().getId(),
-                sanPhamChiTietDto.getChatLieu().getId(),
-                sanPhamChiTietDto.getCoAo().getId(),
-                sanPhamChiTietDto.getTayAo().getId(),
-                sanPhamChiTietDto.getMauSac().getId(),
-                sanPhamChiTietDto.getKichThuoc().getId()
+    private void checkUniqueSanPhamChiTiet(SanPhamChiTietModel model) {
+        boolean exists = sanPhamChiTietRepository.existsBySanPhamAndThuongHieuAndXuatXuAndChatLieuAndCoAoAndTayAoAndMauSacAndKichThuoc(
+                model.getSanPham(),
+                model.getThuongHieu(),
+                model.getXuatXu(),
+                model.getChatLieu(),
+                model.getCoAo(),
+                model.getTayAo(),
+                model.getMauSac(),
+                model.getKichThuoc()
         );
 
-        if (existingSanPhamChiTiet != null) {
-            throw new IllegalArgumentException("Chi tiết sản phẩm này đã tồn tại trong cơ sở dữ liệu");
+        if (exists) {
+            throw new EntityAlreadyExistsException("Chi tiết sản phẩm đã tồn tại trong cơ sở dữ liệu");
         }
+    }
+
+    private void mapToEntity(SanPhamChiTietModel model, SanPhamChiTiet entity) {
+        entity.setSanPham(sanPhamRepository.findById(model.getSanPham()).orElse(null));
+        entity.setThuongHieu(thuongHieuRepository.findById(model.getThuongHieu()).orElse(null));
+        entity.setXuatXu(xuatXuRepository.findById(model.getXuatXu()).orElse(null));
+        entity.setChatLieu(chatLieuRepository.findById(model.getChatLieu()).orElse(null));
+        entity.setCoAo(coAoRepository.findById(model.getCoAo()).orElse(null));
+        entity.setTayAo(tayAoRepository.findById(model.getTayAo()).orElse(null));
+        entity.setMauSac(mauSacRepository.findById(model.getMauSac()).orElse(null));
+        entity.setKichThuoc(kichThuocRepository.findById(model.getKichThuoc()).orElse(null));
+        entity.setSoLuong(model.getSoLuong());
+        entity.setDonGia(model.getDonGia());
+        entity.setHinhAnh(model.getHinhAnh());
+        entity.setTrangThai(true);
+        entity.setNgayTao(Instant.now());
     }
 
     @Transactional
     public List<SanPhamChiTietPhanLoaiDTO> generateSanPhamChiTietGroupedByMauSac(SanPhamChiTietGenerateModel generateRequest) {
-        // Bước 1: Generate danh sách SanPhamChiTietGenerateDTO
-        List<SanPhamChiTietGenerateDTO> sanPhamChiTietList = generateSanPhamChiTietList(generateRequest);
+        // Bước 1: Generate danh sách tất cả các kết hợp sản phẩm chi tiết
+        List<SanPhamChiTietGenerateDTO> allCombinations = generateSanPhamChiTietList(generateRequest);
 
-        // Bước 2: Nhóm danh sách SanPhamChiTietGenerateDTO theo `mauSac`
-        Map<Integer, List<SanPhamChiTietGenerateDTO>> groupedByMauSac = sanPhamChiTietList.stream()
+        // Bước 2: Lọc ra các sản phẩm chi tiết chưa tồn tại
+        List<SanPhamChiTietGenerateDTO> filteredCombinations = allCombinations.stream()
+                .filter(this::isUniqueProductDetail)
+                .collect(Collectors.toList());
+
+        // Bước 3: Nhóm các sản phẩm đã lọc theo màu sắc
+        Map<Integer, List<SanPhamChiTietGenerateDTO>> groupedByMauSac = filteredCombinations.stream()
                 .collect(Collectors.groupingBy(SanPhamChiTietGenerateDTO::getMauSac));
 
-        // Bước 3: Chuyển đổi từ nhóm sang danh sách SanPhamChiTietPhanLoaiDTO
+        // Bước 4: Chuyển đổi thành danh sách DTO để trả về
         return groupedByMauSac.entrySet().stream()
                 .map(this::convertEntryToPhanLoaiDTO)
                 .collect(Collectors.toList());
     }
 
+    private boolean isUniqueProductDetail(SanPhamChiTietGenerateDTO dto) {
+        return !sanPhamChiTietRepository.existsBySanPhamAndThuongHieuAndXuatXuAndChatLieuAndCoAoAndTayAoAndMauSacAndKichThuoc(
+                dto.getSanPham(),
+                dto.getThuongHieu(),
+                dto.getXuatXu(),
+                dto.getChatLieu(),
+                dto.getCoAo(),
+                dto.getTayAo(),
+                dto.getMauSac(),
+                dto.getKichThuoc()
+        );
+    }
 
     private List<SanPhamChiTietGenerateDTO> generateSanPhamChiTietList(SanPhamChiTietGenerateModel generateRequest) {
         List<SanPhamChiTietGenerateDTO> result = new ArrayList<>();
@@ -196,7 +246,7 @@ public class SanPhamChiTietService {
                                             .mauSac(mauSacId)
                                             .kichThuoc(kichThuocId)
                                             .tenKichThuoc(kichThuocRepository.findById(kichThuocId)
-                                                    .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy kích thước!"))
+                                                    .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy kích thước với ID: " + kichThuocId))
                                                     .getTenKichThuoc())
                                             .soLuong(10)
                                             .donGia(BigDecimal.valueOf(50000))
@@ -216,34 +266,16 @@ public class SanPhamChiTietService {
     }
 
     private SanPhamChiTietPhanLoaiDTO convertEntryToPhanLoaiDTO(Map.Entry<Integer, List<SanPhamChiTietGenerateDTO>> entry) {
-        List<SanPhamChiTietPhanLoaiDTO> chiTietSanPham = entry.getValue().stream()
-                .map(this::convertToPhanLoaiDTO)
-                .collect(Collectors.toList());
-
         return SanPhamChiTietPhanLoaiDTO.builder()
                 .maMauSac(entry.getKey())
-                .tenMauSac(mauSacRepository.findById(entry.getKey()).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy màu sắc với ID: " + entry.getKey()))
+                .tenMauSac(mauSacRepository.findById(entry.getKey())
+                        .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy màu sắc với ID: " + entry.getKey()))
                         .getTenMauSac())
-                .sanPhamChiTiet(chiTietSanPham)
+                .sanPhamChiTiet(entry.getValue())
                 .build();
     }
 
-    private SanPhamChiTietPhanLoaiDTO convertToPhanLoaiDTO(SanPhamChiTietGenerateDTO dto) {
-        return SanPhamChiTietPhanLoaiDTO.builder()
-                .maMauSac(dto.getMauSac())
-                .tenMauSac(mauSacRepository.findById(dto.getMauSac()).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy màu sắc với ID: " +  dto.getMauSac()))
-                        .getTenMauSac())
-                .build();
-    }
-
-    public List<SanPhamChiTietPhanLoaiDTO> groupSanPhamByMauSac(Map<Integer, List<SanPhamChiTietGenerateDTO>> groupedByMauSac) {
-        return groupedByMauSac.entrySet().stream()
-                .map(this::convertEntryToPhanLoaiDTO)
-                .collect(Collectors.toList());
-    }
-
-
-    private void mapToEntity(SanPhamChiTietDto dto, SanPhamChiTiet entity) {
+        private void mapToEntity(SanPhamChiTietDto dto, SanPhamChiTiet entity) {
         entity.setSanPham(sanPhamRepository.findById(dto.getSanPham().getId()).get());
         entity.setThuongHieu(thuongHieuRepository.findById(dto.getThuongHieu().getId()).get());
         entity.setXuatXu(xuatXuRepository.findById(dto.getXuatXu().getId()).get());
