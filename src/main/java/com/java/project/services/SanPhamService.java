@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 public class SanPhamService {
@@ -38,21 +39,26 @@ public class SanPhamService {
 
     @Transactional
     public SanPhamDto createSanPham(SanPhamModel sanPhamModel) {
-        // Kiểm tra trùng tên sản phẩm
         Optional<SanPham> existingSanPhamByName = sanPhamRepository.findByTenSanPham(sanPhamModel.getTenSanPham());
         if (existingSanPhamByName.isPresent()) {
             throw new EntityAlreadyExistsException("Tên sản phẩm đã tồn tại.");
         }
 
-        // Kiểm tra trùng mã sản phẩm
-        Optional<SanPham> existingSanPhamByCode = sanPhamRepository.findByMaSanPham(sanPhamModel.getMaSanPham());
-        if (existingSanPhamByCode.isPresent()) {
-            throw new EntityAlreadyExistsException("Mã sản phẩm đã tồn tại.");
+        String maSanPham = sanPhamModel.getMaSanPham();
+        if (maSanPham == null || maSanPham.isBlank()) {
+            do {
+                maSanPham = generateRandomProductCode();
+            } while (sanPhamRepository.findByMaSanPham(maSanPham).isPresent());
+        } else {
+            Optional<SanPham> existingSanPhamByCode = sanPhamRepository.findByMaSanPham(maSanPham);
+            if (existingSanPhamByCode.isPresent()) {
+                throw new EntityAlreadyExistsException("Mã sản phẩm đã tồn tại.");
+            }
         }
 
         SanPham sanPham = new SanPham();
         sanPham.setTenSanPham(sanPhamModel.getTenSanPham());
-        sanPham.setMaSanPham(sanPhamModel.getMaSanPham());
+        sanPham.setMaSanPham(maSanPham);
         sanPham.setMoTa(sanPhamModel.getMoTa());
         sanPham.setNgayTao(Instant.now());
         sanPham.setTrangThai(true);
@@ -61,6 +67,18 @@ public class SanPhamService {
 
         return SanPhamMapper.toDTO(sanPham, sanPhamRepository.countSLByID(sanPham.getId()));
     }
+
+    private String generateRandomProductCode() {
+        int length = 8;
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        StringBuilder code = new StringBuilder();
+        Random random = new Random();
+        for (int i = 0; i < length; i++) {
+            code.append(characters.charAt(random.nextInt(characters.length())));
+        }
+        return code.toString();
+    }
+
 
     @Transactional
     public SanPhamDto updateSanPham(Integer id, SanPhamModel sanPhamModel) {

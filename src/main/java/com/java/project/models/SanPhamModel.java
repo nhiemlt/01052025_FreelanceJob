@@ -8,7 +8,6 @@ public class SanPhamModel {
     @NotBlank(message = "Tên sản phẩm không được để trống")
     private String tenSanPham;
 
-    @NotBlank(message = "Mã sản phẩm không được để trống")
     private String maSanPham;
 
     private String moTa;
