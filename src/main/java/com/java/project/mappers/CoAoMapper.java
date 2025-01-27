@@ -9,6 +9,7 @@ public class CoAoMapper {
                 .id(coAo.getId())
                 .tenCoAo(coAo.getTenCoAo())
                 .trangThai(coAo.getTrangThai())
+                .ngayTao(coAo.getNgayTao())
                 .build();
     }
 }

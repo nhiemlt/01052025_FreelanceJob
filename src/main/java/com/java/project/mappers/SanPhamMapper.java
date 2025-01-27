@@ -12,6 +12,7 @@ public class SanPhamMapper {
                 .maSanPham(sanPham.getMaSanPham())
                 .moTa(sanPham.getMoTa())
                 .trangThai(sanPham.getTrangThai())
+                .ngayTao(sanPham.getNgayTao())
                 .build();
     }
 }

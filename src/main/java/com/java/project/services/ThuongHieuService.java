@@ -13,6 +13,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
+
 @Service
 public class ThuongHieuService {
 
@@ -39,6 +41,7 @@ public class ThuongHieuService {
         ThuongHieu thuongHieu = new ThuongHieu();
         thuongHieu.setTenThuongHieu(thuongHieuModel.getTenThuongHieu());
         thuongHieu.setTrangThai(true);
+        thuongHieu.setNgayTao(Instant.now());
         thuongHieu = thuongHieuRepository.save(thuongHieu);
         return ThuongHieuMapper.toDTO(thuongHieu);
     }

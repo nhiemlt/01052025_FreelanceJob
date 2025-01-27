@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.Value;
 
 import java.io.Serializable;
+import java.time.Instant;
 
 /**
  * DTO for {@link com.java.project.entities.XuatXu}
@@ -20,4 +21,5 @@ public class XuatXuDto implements Serializable {
     String tenXuatXu;
     @NotNull
     Boolean trangThai;
+    Instant ngayTao;
 }

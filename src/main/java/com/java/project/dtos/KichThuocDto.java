@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.Value;
 
 import java.io.Serializable;
+import java.time.Instant;
 
 /**
  * DTO for {@link com.java.project.entities.KichThuoc}
@@ -20,4 +21,5 @@ public class KichThuocDto implements Serializable {
     String tenKichThuoc;
     @NotNull
     Boolean trangThai;
+    Instant ngayTao;
 }

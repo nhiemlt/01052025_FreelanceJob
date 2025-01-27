@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.time.Instant;
 
 /**
  * DTO for {@link com.java.project.entities.ChatLieu}
@@ -16,4 +17,5 @@ public class ChatLieuDto implements Serializable {
     Integer id;
     String tenChatLieu;
     Boolean trangThai;
+    Instant ngayTao;
 }

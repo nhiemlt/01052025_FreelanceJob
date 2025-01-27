@@ -13,6 +13,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
+
 @Service
 public class XuatXuService {
 
@@ -39,6 +41,7 @@ public class XuatXuService {
         XuatXu xuatXu = new XuatXu();
         xuatXu.setTenXuatXu(xuatXuModel.getTenXuatXu());
         xuatXu.setTrangThai(true);
+        xuatXu.setNgayTao(Instant.now());
         xuatXu = xuatXuRepository.save(xuatXu);
         return XuatXuMapper.toDTO(xuatXu);
     }

@@ -13,6 +13,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
+
 @Service
 public class MauSacService {
 
@@ -47,6 +49,7 @@ public class MauSacService {
         mauSac.setMaHex(mauSacModel.getMaHex());
         mauSac.setTenMauSac(mauSacModel.getTenMauSac());
         mauSac.setTrangThai(true);
+        mauSac.setNgayTao(Instant.now());
         mauSac = mauSacRepository.save(mauSac);
         return MauSacMapper.toDTO(mauSac);
     }

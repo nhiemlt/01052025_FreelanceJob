@@ -13,6 +13,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
+
 @Service
 public class TayAoService {
 
@@ -39,6 +41,7 @@ public class TayAoService {
         TayAo tayAo = new TayAo();
         tayAo.setTenTayAo(tayAoModel.getTenTayAo());
         tayAo.setTrangThai(true);
+        tayAo.setNgayTao(Instant.now());
         tayAo = tayAoRepository.save(tayAo);
         return TayAoMapper.toDTO(tayAo);
     }

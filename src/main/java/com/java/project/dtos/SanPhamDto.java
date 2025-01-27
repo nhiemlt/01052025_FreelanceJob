@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.Value;
 
 import java.io.Serializable;
+import java.time.Instant;
 
 /**
  * DTO for {@link com.java.project.entities.SanPham}
@@ -26,4 +27,5 @@ public class SanPhamDto implements Serializable {
     String moTa;
     @NotNull
     Boolean trangThai;
+    Instant ngayTao;
 }

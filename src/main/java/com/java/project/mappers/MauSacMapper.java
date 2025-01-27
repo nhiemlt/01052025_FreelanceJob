@@ -10,6 +10,7 @@ public class MauSacMapper {
                 .maHex(mauSac.getMaHex())
                 .tenMauSac(mauSac.getTenMauSac())
                 .trangThai(mauSac.getTrangThai())
+                .ngayTao(mauSac.getNgayTao())
                 .build();
     }
 }

@@ -9,6 +9,7 @@ public class ThuongHieuMapper {
                 .id(thuongHieu.getId())
                 .tenThuongHieu(thuongHieu.getTenThuongHieu())
                 .trangThai(thuongHieu.getTrangThai())
+                .ngayTao(thuongHieu.getNgayTao())
                 .build();
     }
 }

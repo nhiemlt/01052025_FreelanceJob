@@ -13,6 +13,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
+
 @Service
 public class CoAoService {
 
@@ -39,6 +41,7 @@ public class CoAoService {
         CoAo coAo = new CoAo();
         coAo.setTenCoAo(coAoModel.getTenCoAo());
         coAo.setTrangThai(true);
+        coAo.setNgayTao(Instant.now());
         coAo = coAoRepository.save(coAo);
         return CoAoMapper.toDTO(coAo);
     }

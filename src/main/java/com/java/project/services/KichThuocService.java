@@ -13,6 +13,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
+
 @Service
 public class KichThuocService {
 
@@ -40,6 +42,7 @@ public class KichThuocService {
         KichThuoc kichThuoc = new KichThuoc();
         kichThuoc.setTenKichThuoc(kichThuocModel.getTenKichThuoc());
         kichThuoc.setTrangThai(true);
+        kichThuoc.setNgayTao(Instant.now());
         kichThuoc = kichThuocRepository.save(kichThuoc);
         return KichThuocMapper.toDTO(kichThuoc);
     }

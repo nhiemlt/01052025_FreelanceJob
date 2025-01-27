@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.Value;
 
 import java.io.Serializable;
+import java.time.Instant;
 
 /**
  * DTO for {@link com.java.project.entities.CoAo}
@@ -17,4 +18,5 @@ public class CoAoDto implements Serializable {
     Integer id;
     String tenCoAo;
     Boolean trangThai;
+    Instant ngayTao;
 }

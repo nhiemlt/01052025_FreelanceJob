@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.Optional;
 
 @Service
@@ -53,6 +54,7 @@ public class SanPhamService {
         sanPham.setTenSanPham(sanPhamModel.getTenSanPham());
         sanPham.setMaSanPham(sanPhamModel.getMaSanPham());
         sanPham.setMoTa(sanPhamModel.getMoTa());
+        sanPham.setNgayTao(Instant.now());
         sanPham.setTrangThai(true);
 
         sanPhamRepository.save(sanPham);

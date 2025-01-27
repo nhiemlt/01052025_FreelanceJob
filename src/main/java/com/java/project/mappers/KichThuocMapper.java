@@ -9,6 +9,7 @@ public class KichThuocMapper {
                 .id(kichThuoc.getId())
                 .tenKichThuoc(kichThuoc.getTenKichThuoc())
                 .trangThai(kichThuoc.getTrangThai())
+                .ngayTao(kichThuoc.getNgayTao())
                 .build();
     }
 }

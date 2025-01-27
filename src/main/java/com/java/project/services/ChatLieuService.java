@@ -13,6 +13,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+
 @Service
 public class ChatLieuService {
 
@@ -39,6 +41,7 @@ public class ChatLieuService {
         ChatLieu chatLieu = new ChatLieu();
         chatLieu.setTenChatLieu(chatLieuModel.getTenChatLieu());
         chatLieu.setTrangThai(true);
+        chatLieu.setNgayTao(Instant.now());
         chatLieu = chatLieuRepository.save(chatLieu);
         return ChatLieuMapper.toDTO(chatLieu);
     }

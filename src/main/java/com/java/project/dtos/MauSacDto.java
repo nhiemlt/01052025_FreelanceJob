@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.time.Instant;
 
 /**
  * DTO for {@link com.java.project.entities.MauSac}
@@ -15,4 +16,5 @@ public class MauSacDto implements Serializable {
     String maHex;
     String tenMauSac;
     Boolean trangThai;
+    Instant ngayTao;
 }

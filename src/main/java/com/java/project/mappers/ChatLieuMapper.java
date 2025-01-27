@@ -9,6 +9,7 @@ public class ChatLieuMapper {
                 .id(chatLieu.getId())
                 .tenChatLieu(chatLieu.getTenChatLieu())
                 .trangThai(chatLieu.getTrangThai())
+                .ngayTao(chatLieu.getNgayTao())
                 .build();
     }
 }

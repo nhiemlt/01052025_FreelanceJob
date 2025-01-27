@@ -8,6 +8,8 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Nationalized;
 
+import java.time.Instant;
+
 @Getter
 @Setter
 @Entity
@@ -40,4 +42,8 @@ public class SanPham {
     @Column(name = "trang_thai", nullable = false)
     private Boolean trangThai = false;
 
+    @NotNull
+    @ColumnDefault("getdate()")
+    @Column(name = "ngay_tao", nullable = false)
+    private Instant ngayTao;
 }

@@ -11,6 +11,7 @@ public class TayAoMapper {
                 .id(tayAo.getId())
                 .tenTayAo(tayAo.getTenTayAo())
                 .trangThai(tayAo.getTrangThai())
+                .ngayTao(tayAo.getNgayTao())
                 .build();
     }
 }
