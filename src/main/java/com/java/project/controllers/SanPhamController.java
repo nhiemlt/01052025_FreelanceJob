@@ -1,5 +1,6 @@
 package com.java.project.controllers;
 
+import com.java.project.dtos.SanPhamChiTietDto;
 import com.java.project.dtos.SanPhamDto;
 import com.java.project.dtos.ApiResponse;
 import com.java.project.exceptions.EntityAlreadyExistsException;
@@ -16,6 +17,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
@@ -42,6 +44,18 @@ public class SanPhamController {
         try {
             SanPhamDto sanPhamDto = sanPhamService.getById(id);
             return ResponseEntity.ok(new ApiResponse("success", "Lấy thông tin sản phẩm thành công", sanPhamDto));
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse("error", e.getMessage(), null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse("error", "Lỗi hệ thống: " + e.getMessage(), null));
+        }
+    }
+
+    @GetMapping("/{id}/detail")
+    public ResponseEntity<ApiResponse> getSanPhamChiTietById(@PathVariable Integer id) {
+        try {
+            List<SanPhamChiTietDto> sanPhamChiTietDtos = sanPhamService.getSanPhamChiTietById(id);
+            return ResponseEntity.ok(new ApiResponse("success", "Lấy danh sách chi tiết sản phẩm thành công", sanPhamChiTietDtos));
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse("error", e.getMessage(), null));
         } catch (Exception e) {

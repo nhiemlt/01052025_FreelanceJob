@@ -1,11 +1,15 @@
 package com.java.project.services;
 
+import com.java.project.dtos.SanPhamChiTietDto;
 import com.java.project.dtos.SanPhamDto;
 import com.java.project.entities.SanPham;
+import com.java.project.entities.SanPhamChiTiet;
 import com.java.project.exceptions.EntityAlreadyExistsException;
 import com.java.project.exceptions.EntityNotFoundException;
+import com.java.project.mappers.SanPhamChiTietMapper;
 import com.java.project.mappers.SanPhamMapper;
 import com.java.project.models.SanPhamModel;
+import com.java.project.repositories.SanPhamChiTietRepository;
 import com.java.project.repositories.SanPhamRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -14,14 +18,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 @Service
 public class SanPhamService {
 
     @Autowired
     private SanPhamRepository sanPhamRepository;
+
+    @Autowired
+    private SanPhamChiTietRepository sanPhamChiTietRepository;
 
     public Page<SanPhamDto> getAllSanPham(String search, Pageable pageable) {
         Page<SanPham> sanPhams = sanPhamRepository.searchByNameOrCode(search, pageable);
@@ -36,6 +45,20 @@ public class SanPhamService {
         return SanPhamMapper.toDTO(sanPham, soLuong);
     }
 
+    @Transactional
+    public List<SanPhamChiTietDto> getSanPhamChiTietById(Integer id) {
+        SanPham sanPham = sanPhamRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy sản phẩm"));
+
+        List<SanPhamChiTiet> sanPhamChiTiets = sanPhamChiTietRepository.findBySanPhamId(id);
+        if (sanPhamChiTiets.isEmpty()) {
+            throw new EntityNotFoundException("Không tìm thấy chi tiết sản phẩm");
+        }
+
+        return sanPhamChiTiets.stream()
+                .map(SanPhamChiTietMapper::toDTO)
+                .collect(Collectors.toList());
+    }
 
     @Transactional
     public SanPhamDto createSanPham(SanPhamModel sanPhamModel) {
