@@ -96,24 +96,73 @@ public class SanPhamChiTietService {
     @Transactional
     public SanPhamChiTietDto updateSanPhamChiTiet(Integer id, UpdateSanPhamChiTietModel model) {
 
+        // Tìm chi tiết sản phẩm theo ID
         SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Chi tiết sản phẩm không tồn tại"));
 
+        // Cập nhật Thương hiệu nếu có
+        if (model.getThuongHieu() != null) {
+            sanPhamChiTiet.setThuongHieu(thuongHieuRepository.findById(model.getThuongHieu())
+                    .orElseThrow(() -> new EntityNotFoundException("Thương hiệu không tồn tại")));
+        }
+
+        // Cập nhật Xuất xứ nếu có
+        if (model.getXuatXu() != null) {
+            sanPhamChiTiet.setXuatXu(xuatXuRepository.findById(model.getXuatXu())
+                    .orElseThrow(() -> new EntityNotFoundException("Xuất xứ không tồn tại")));
+        }
+
+        // Cập nhật Chất liệu nếu có
+        if (model.getChatLieu() != null) {
+            sanPhamChiTiet.setChatLieu(chatLieuRepository.findById(model.getChatLieu())
+                    .orElseThrow(() -> new EntityNotFoundException("Chất liệu không tồn tại")));
+        }
+
+        // Cập nhật Cổ áo nếu có
+        if (model.getCoAo() != null) {
+            sanPhamChiTiet.setCoAo(coAoRepository.findById(model.getCoAo())
+                    .orElseThrow(() -> new EntityNotFoundException("Cổ áo không tồn tại")));
+        }
+
+        // Cập nhật Tay áo nếu có
+        if (model.getTayAo() != null) {
+            sanPhamChiTiet.setTayAo(tayAoRepository.findById(model.getTayAo())
+                    .orElseThrow(() -> new EntityNotFoundException("Tay áo không tồn tại")));
+        }
+
+        // Cập nhật Màu sắc nếu có
+        if (model.getMauSac() != null) {
+            sanPhamChiTiet.setMauSac(mauSacRepository.findById(model.getMauSac())
+                    .orElseThrow(() -> new EntityNotFoundException("Màu sắc không tồn tại")));
+        }
+
+        // Cập nhật Kích thước nếu có
+        if (model.getKichThuoc() != null) {
+            sanPhamChiTiet.setKichThuoc(kichThuocRepository.findById(model.getKichThuoc())
+                    .orElseThrow(() -> new EntityNotFoundException("Kích thước không tồn tại")));
+        }
+
+        // Cập nhật Số lượng nếu có
         if (model.getSoLuong() != null) {
             sanPhamChiTiet.setSoLuong(model.getSoLuong());
         }
+
+        // Cập nhật Đơn giá nếu có
         if (model.getDonGia() != null) {
             sanPhamChiTiet.setDonGia(model.getDonGia());
         }
+
+        // Cập nhật Hình ảnh nếu có
         if (model.getHinhAnh() != null) {
             sanPhamChiTiet.setHinhAnh(model.getHinhAnh());
         }
 
+        // Lưu lại thông tin đã cập nhật vào database
         sanPhamChiTietRepository.save(sanPhamChiTiet);
 
+        // Trả về DTO sau khi cập nhật
         return SanPhamChiTietMapper.toDTO(sanPhamChiTiet);
     }
-
 
     public SanPhamChiTietDto toggleTrangThai(Integer id) {
         SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietRepository.findById(id)
@@ -197,7 +246,7 @@ public class SanPhamChiTietService {
         entity.setKichThuoc(kichThuocRepository.findById(model.getKichThuoc()).orElse(null));
         entity.setSoLuong(model.getSoLuong());
         entity.setDonGia(model.getDonGia());
-        entity.setHinhAnh(model.getHinhAnh());
+        entity.setHinhAnh(model.getHinhAnh() != null ? model.getHinhAnh() : "default_image.jpg");
         entity.setTrangThai(true);
         entity.setNgayTao(Instant.now());
     }
@@ -248,11 +297,29 @@ public class SanPhamChiTietService {
                                     SanPhamChiTietGenerateDTO dto = SanPhamChiTietGenerateDTO.builder()
                                             .sanPham(generateRequest.getSanPham())
                                             .thuongHieu(thuongHieuId)
+                                            .tenThuongHieu(thuongHieuRepository.findById(thuongHieuId)
+                                                    .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy thương hiệu với ID: " + thuongHieuId))
+                                                    .getTenThuongHieu())
                                             .xuatXu(xuatXuId)
+                                            .tenXuatXu(xuatXuRepository.findById(xuatXuId)
+                                                    .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy xuất xứ với ID: " + xuatXuId))
+                                                    .getTenXuatXu())
                                             .chatLieu(chatLieuId)
+                                            .tenChatLieu(chatLieuRepository.findById(chatLieuId)
+                                                    .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy chất liệu với ID: " + chatLieuId))
+                                                    .getTenChatLieu())
                                             .coAo(coAoId)
+                                            .tenCoAo(coAoRepository.findById(coAoId)
+                                                    .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy cổ áo với ID: " + coAoId))
+                                                    .getTenCoAo())
                                             .tayAo(tayAoId)
+                                            .tenTayAo(tayAoRepository.findById(tayAoId)
+                                                    .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy tay áo với ID: " + tayAoId))
+                                                    .getTenTayAo())
                                             .mauSac(mauSacId)
+                                            .tenMauSac(mauSacRepository.findById(mauSacId)
+                                                    .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy màu sắc với ID: " + mauSacId))
+                                                    .getTenMauSac())
                                             .kichThuoc(kichThuocId)
                                             .tenKichThuoc(kichThuocRepository.findById(kichThuocId)
                                                     .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy kích thước với ID: " + kichThuocId))
@@ -282,20 +349,5 @@ public class SanPhamChiTietService {
                         .getTenMauSac())
                 .sanPhamChiTiet(entry.getValue())
                 .build();
-    }
-
-        private void mapToEntity(SanPhamChiTietDto dto, SanPhamChiTiet entity) {
-        entity.setSanPham(sanPhamRepository.findById(dto.getSanPham().getId()).get());
-        entity.setThuongHieu(thuongHieuRepository.findById(dto.getThuongHieu().getId()).get());
-        entity.setXuatXu(xuatXuRepository.findById(dto.getXuatXu().getId()).get());
-        entity.setChatLieu(chatLieuRepository.findById(dto.getChatLieu().getId()).get());
-        entity.setCoAo(coAoRepository.findById(dto.getCoAo().getId()).get());
-        entity.setTayAo(tayAoRepository.findById(dto.getTayAo().getId()).get());
-        entity.setMauSac(mauSacRepository.findById(dto.getMauSac().getId()).get());
-        entity.setKichThuoc(kichThuocRepository.findById(dto.getKichThuoc().getId()).get());
-        entity.setSoLuong(dto.getSoLuong());
-        entity.setDonGia(dto.getDonGia());
-        entity.setHinhAnh(dto.getHinhAnh());
-        entity.setTrangThai(dto.getTrangThai());
     }
 }
