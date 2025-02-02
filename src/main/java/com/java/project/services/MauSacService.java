@@ -6,7 +6,9 @@ import com.java.project.exceptions.EntityAlreadyExistsException;
 import com.java.project.exceptions.EntityNotFoundException;
 import com.java.project.mappers.MauSacMapper;
 import com.java.project.models.MauSacModel;
+import com.java.project.models.MauSacUpdateModel;
 import com.java.project.repositories.MauSacRepository;
+import io.micrometer.common.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -55,23 +57,28 @@ public class MauSacService {
     }
 
     @Transactional
-    public MauSacDto updateMauSac(Integer id, MauSacModel mauSacModel) {
+    public MauSacDto updateMauSac(Integer id, MauSacUpdateModel mauSacModel) {
         MauSac mauSac = mauSacRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy màu sắc"));
 
-        if (mauSacRepository.findByTenMauSac(mauSacModel.getTenMauSac()).isPresent()) {
-            throw new EntityAlreadyExistsException("Tên màu sắc đã tồn tại");
+        if (StringUtils.isNotEmpty(mauSacModel.getTenMauSac()) && !mauSacModel.getTenMauSac().equals(mauSac.getTenMauSac())) {
+            if (mauSacRepository.findByTenMauSac(mauSacModel.getTenMauSac()).isPresent()) {
+                throw new EntityAlreadyExistsException("Tên màu sắc đã tồn tại");
+            }
+            mauSac.setTenMauSac(mauSacModel.getTenMauSac());
         }
 
-        if (mauSacRepository.findByMaHex(mauSacModel.getMaHex()).isPresent()) {
-            throw new EntityAlreadyExistsException("Mã màu HEX đã tồn tại");
+        if (StringUtils.isNotEmpty(mauSacModel.getMaHex()) && !mauSacModel.getMaHex().equals(mauSac.getMaHex())) {
+            if (mauSacRepository.findByMaHex(mauSacModel.getMaHex()).isPresent()) {
+                throw new EntityAlreadyExistsException("Mã màu HEX đã tồn tại");
+            }
+            mauSac.setMaHex(mauSacModel.getMaHex());
         }
 
-        mauSac.setMaHex(mauSacModel.getMaHex());
-        mauSac.setTenMauSac(mauSacModel.getTenMauSac());
         mauSac = mauSacRepository.save(mauSac);
         return MauSacMapper.toDTO(mauSac);
     }
+
 
     @Transactional
     public void toggleTrangThai(Integer id) {

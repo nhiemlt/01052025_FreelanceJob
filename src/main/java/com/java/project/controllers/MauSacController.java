@@ -2,6 +2,7 @@ package com.java.project.controllers;
 
 import com.java.project.dtos.MauSacDto;
 import com.java.project.models.MauSacModel;
+import com.java.project.models.MauSacUpdateModel;
 import com.java.project.services.MauSacService;
 import com.java.project.exceptions.EntityAlreadyExistsException;
 import com.java.project.exceptions.EntityNotFoundException;
@@ -78,7 +79,7 @@ public class MauSacController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse> updateMauSac(@PathVariable Integer id,
-                                                    @Valid @RequestBody MauSacModel mauSacModel,
+                                                    @Valid @RequestBody MauSacUpdateModel mauSacModel,
                                                     BindingResult bindingResult) {
         try {
             if (bindingResult.hasErrors()) {
@@ -99,7 +100,7 @@ public class MauSacController {
                     .body(new ApiResponse("error", "Màu sắc đã tồn tại", null));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse("error", "Có lỗi xảy ra trong quá trình xử lý", null));
+                    .body(new ApiResponse("error", "Có lỗi xảy ra trong quá trình xử lý", e.getMessage()));
         }
     }
 

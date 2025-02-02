@@ -51,7 +51,7 @@ public class ThuongHieuService {
         ThuongHieu thuongHieu = thuongHieuRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy thương hiệu"));
 
-        if (thuongHieuRepository.findByTenThuongHieu(thuongHieuModel.getTenThuongHieu()).isPresent()) {
+        if (!thuongHieu.getTenThuongHieu().equalsIgnoreCase(thuongHieuModel.getTenThuongHieu()) && thuongHieuRepository.findByTenThuongHieu(thuongHieuModel.getTenThuongHieu()).isPresent()) {
             throw new EntityAlreadyExistsException("Tên thương hiệu đã tồn tại");
         }
 
