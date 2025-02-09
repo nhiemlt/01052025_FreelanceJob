@@ -38,9 +38,10 @@ public class SanPhamChiTietController {
             @RequestParam(required = false) List<Integer> tayAoIds,
             @RequestParam(required = false) List<Integer> mauSacIds,
             @RequestParam(required = false) List<Integer> kichThuocIds,
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice,
             Pageable pageable) {
         try {
-            // Nếu các tham số là null hoặc rỗng, có thể thay thế chúng bằng null hoặc bộ lọc mặc định
             if (thuongHieuIds != null && thuongHieuIds.isEmpty()) thuongHieuIds = null;
             if (xuatXuIds != null && xuatXuIds.isEmpty()) xuatXuIds = null;
             if (chatLieuIds != null && chatLieuIds.isEmpty()) chatLieuIds = null;
@@ -50,13 +51,16 @@ public class SanPhamChiTietController {
             if (kichThuocIds != null && kichThuocIds.isEmpty()) kichThuocIds = null;
 
             Page<SanPhamChiTietDto> result = sanPhamChiTietService.getAllSanPhamChiTiet(
-                    search, thuongHieuIds, xuatXuIds, chatLieuIds, coAoIds, tayAoIds, mauSacIds, kichThuocIds, pageable);
+                    search, thuongHieuIds, xuatXuIds, chatLieuIds, coAoIds, tayAoIds,
+                    mauSacIds, kichThuocIds, minPrice, maxPrice, pageable);
+
             return ResponseEntity.ok(new ApiResponse("success", "Lấy danh sách chi tiết sản phẩm thành công", result));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ApiResponse("error", "Có lỗi xảy ra: " + e.getMessage(), null));
         }
     }
+
 
 
 

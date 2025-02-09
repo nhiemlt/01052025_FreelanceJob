@@ -52,14 +52,21 @@ public class SanPhamChiTietService {
     @Autowired
     private KichThuocRepository kichThuocRepository;
 
-    public Page<SanPhamChiTietDto> getAllSanPhamChiTiet(String search, List<Integer> thuongHieuIds, List<Integer> xuatXuIds,
-                                                        List<Integer> chatLieuIds, List<Integer> coAoIds, List<Integer> tayAoIds,
-                                                        List<Integer> mauSacIds, List<Integer> kichThuocIds, Pageable pageable) {
+    public Page<SanPhamChiTietDto> getAllSanPhamChiTiet(
+            String search,
+            List<Integer> thuongHieuIds, List<Integer> xuatXuIds,
+            List<Integer> chatLieuIds, List<Integer> coAoIds, List<Integer> tayAoIds,
+            List<Integer> mauSacIds, List<Integer> kichThuocIds,
+            Double minPrice, Double maxPrice,  // Thêm tham số lọc giá
+            Pageable pageable) {
+
         Page<SanPhamChiTiet> sanPhamChiTiets = sanPhamChiTietRepository.findBySearchAndFilter(
-                search, thuongHieuIds, xuatXuIds, chatLieuIds, coAoIds, tayAoIds, mauSacIds, kichThuocIds, pageable);
+                search, thuongHieuIds, xuatXuIds, chatLieuIds, coAoIds, tayAoIds,
+                mauSacIds, kichThuocIds, minPrice, maxPrice, pageable);
 
         return sanPhamChiTiets.map(SanPhamChiTietMapper::toDTO);
     }
+
 
     @Transactional
     public SanPhamChiTietDto getById(Integer id) {
