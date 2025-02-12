@@ -303,6 +303,8 @@ public class SanPhamChiTietService {
                                 for (Integer kichThuocId : generateRequest.getKichThuoc()) {
                                     SanPhamChiTietGenerateDTO dto = SanPhamChiTietGenerateDTO.builder()
                                             .sanPham(generateRequest.getSanPham())
+                                            .tenSanPham(sanPhamRepository.findById(generateRequest.getSanPham()).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy sản phẩm với ID: " + generateRequest.getSanPham()))
+                                                    .getTenSanPham())
                                             .thuongHieu(thuongHieuId)
                                             .tenThuongHieu(thuongHieuRepository.findById(thuongHieuId)
                                                     .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy thương hiệu với ID: " + thuongHieuId))
@@ -354,6 +356,7 @@ public class SanPhamChiTietService {
                 .tenMauSac(mauSacRepository.findById(entry.getKey())
                         .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy màu sắc với ID: " + entry.getKey()))
                         .getTenMauSac())
+                .tenSanPham(entry.getValue().get(0).getTenSanPham())
                 .sanPhamChiTiet(entry.getValue())
                 .build();
     }

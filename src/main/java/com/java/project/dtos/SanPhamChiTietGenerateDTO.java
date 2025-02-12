@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 @Builder
 public class SanPhamChiTietGenerateDTO {
     private Integer sanPham;
+    private String tenSanPham;
 
     private Integer thuongHieu;
     private String tenThuongHieu;
