@@ -36,7 +36,6 @@ public class ChatLieuController {
             @RequestParam(value = "size", defaultValue = "10") int size,
             @RequestParam(value = "sort", defaultValue = "id") String sort,
             @RequestParam(value = "direction", defaultValue = "ASC") String direction) {
-
         try {
             Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.by(sort).with(Sort.Direction.fromString(direction))));
             Page<ChatLieuDto> chatLieuDtos = chatLieuService.getAll(search, pageable);
