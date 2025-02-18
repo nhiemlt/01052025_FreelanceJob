@@ -43,8 +43,8 @@ public class KhachHang {
     @Column(name = "ngay_sinh")
     private LocalDate ngaySinh;
 
-    @Column(name = "url_avatar")
-    private String urlAvatar;
+    @Column(name = "avatar_url")
+    private String avatarUrl;
 
     @Column(name = "trang_thai")
     private Integer trangThai;

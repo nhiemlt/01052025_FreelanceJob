@@ -42,6 +42,9 @@ public class NhanVien {
     @Column(name = "dia_chi")
     private String diaChi;
 
+    @Column(name = "avatar_url")
+    private String avatarUrl;
+
     @Column(name = "trang_thai")
     private Integer trangThai;
 
