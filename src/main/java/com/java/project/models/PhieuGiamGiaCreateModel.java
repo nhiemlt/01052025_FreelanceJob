@@ -17,10 +17,8 @@ public class PhieuGiamGiaCreateModel {
     @Size(max = 255, message = "Tên phiếu giảm giá không được quá 255 ký tự")
     private String tenPhieuGiamGia;
 
-    @FutureOrPresent(message = "Thời gian áp dụng phải là hiện tại hoặc tương lai")
     private LocalDateTime thoiGianApDung;
 
-    @Future(message = "Thời gian hết hạn phải ở tương lai")
     private LocalDateTime thoiGianHetHan;
 
     @NotNull(message = "Giá trị giảm không được để trống")
